@@ -106,9 +106,9 @@ int main()
 
     /* Create kernel arguments */
     err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &board_1_buffer);
-    err |= clSetKernelArg(kernel, 1, ARRAY_SIZE * sizeof(int), NULL);
-    err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), &board_2_buffer);
-    err |= clSetKernelArg(kernel, 3, ARRAY_SIZE * sizeof(int), NULL);
+    // err |= clSetKernelArg(kernel, 1, ARRAY_SIZE * sizeof(int), NULL);
+    err |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &board_2_buffer);
+    // err |= clSetKernelArg(kernel, 3, ARRAY_SIZE * sizeof(int), NULL);
     if (err < 0)
     {
         perror("Couldn't create a kernel argument");
