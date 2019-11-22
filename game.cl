@@ -1,4 +1,4 @@
-__kernel game_simulation(__global int *board_curr, __global int *board_next)
+__kernel void game_simulation(__global int *board_curr, __global int *board_next)
 {
     uint global_addr;
     global_addr = get_global_id(0);

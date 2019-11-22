@@ -133,7 +133,8 @@ int main()
         exit(1);
     }
 
-    
+    printBoard(board_1);
+    printBoard(board_2);
 
     /* Deallocate resources */
     clReleaseKernel(kernel);
