@@ -67,10 +67,8 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
             if (lwr_lim || upp_lim)
                 continue;
             
-            bours += 1;
+            bours += a[j];
         }
-        
-        bours += 10;
     }
 
     c[gid] = (bours * 100) + (count * 10) + a[gid];
