@@ -40,9 +40,9 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
         count += a[i];
     }
 
-    gid -= 1;
-    if (gid < 0)
-        gid = 1;
+    int agid = gid - 1;
+    if (agid < 0)
+        agid = 1;
 
-    c[gid] = (gid*100) + a[gid];
+    c[gid] = (gid*100) + a[agid];
 }
