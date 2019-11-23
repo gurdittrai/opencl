@@ -88,8 +88,10 @@ int main(int argc, char **argv)
     // initiaze variables
     int bytes = ARRAY_SIZE * sizeof(int);
     int k_cnt = 2;
-    // int output = 1;
+    int output = 1;
     int i;
+    size_t global_size = ARRAY_SIZE;
+    size_t local_size = ROW_SIZE; 
 
     // Allocate memories for input arrays and output array.
     int *A = initBoard(1); printBoard(A);
@@ -136,9 +138,7 @@ int main(int argc, char **argv)
     ret = clSetKernelArg(kernel[1], 1, sizeof(cl_mem), (void *)&aMemObj);
 
     // Execute the kernel
-    size_t globalItemSize = ARRAY_SIZE;
-    size_t localItemSize = ROW_SIZE; // globalItemSize has to be a multiple of localItemSize. 24/8 = 3
-    ret = clEnqueueNDRangeKernel(commandQueue, kernel[0], 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
+    ret = clEnqueueNDRangeKernel(commandQueue, kernel[0], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
 
     // Read from device back to host.
     ret = clEnqueueReadBuffer(commandQueue, bMemObj, CL_TRUE, 0, bytes, B, 0, NULL, NULL);
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
     printBoard(B); printf("--\n");
 
     // Execute the kernel 2
-    ret = clEnqueueNDRangeKernel(commandQueue, kernel[1], 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
+    ret = clEnqueueNDRangeKernel(commandQueue, kernel[1], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
 
     // Read from device back to host.
     ret = clEnqueueReadBuffer(commandQueue, aMemObj, CL_TRUE, 0, bytes, A, 0, NULL, NULL);
@@ -156,11 +156,8 @@ int main(int argc, char **argv)
     printBoard(B); printf("--\n");
 
     // Write result
-    // int i;
-    // for (i = 0; i < ARRAY_SIZE; ++i)
-    // {
-    //     printf("%d + %d = %d\n", A[i], B[i], C[i]);
-    // }
+    if (output == 1)
+        printf("Finished\n");
 
     // Clean up, release memory.
     ret = clFlush(commandQueue);
