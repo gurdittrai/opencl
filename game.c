@@ -66,10 +66,7 @@ int main(int argc, char **argv)
 
     // Allocate memories for input arrays and output array.
     int *A = initBoard(1);
-    int *B = initBoard(0);
-
-    // Output
-    int *C = malloc(sizeof(int) * ARRAY_SIZE);
+    int *B = malloc(sizeof(int) * ARRAY_SIZE);
 
     // Getting platform and device information
     cl_platform_id platformId = NULL;
@@ -88,11 +85,9 @@ int main(int argc, char **argv)
     // Memory buffers for each array
     cl_mem aMemObj = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
     cl_mem bMemObj = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
-    cl_mem cMemObj = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
 
     // Copy lists to memory buffers
     ret = clEnqueueWriteBuffer(commandQueue, aMemObj, CL_TRUE, 0, bytes, A, 0, NULL, NULL);
-    ret = clEnqueueWriteBuffer(commandQueue, bMemObj, CL_TRUE, 0, bytes, B, 0, NULL, NULL);
 
     // create program
     cl_program program = build_program(context, deviceID, PROGRAM_FILE);
@@ -106,7 +101,6 @@ int main(int argc, char **argv)
     // Set arguments for kernel
     ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&aMemObj);
     ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&bMemObj);
-    ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&cMemObj);
 
     // Execute the kernel
     size_t globalItemSize = ARRAY_SIZE;
@@ -114,18 +108,17 @@ int main(int argc, char **argv)
     ret = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
 
     // Read from device back to host.
-    ret = clEnqueueReadBuffer(commandQueue, cMemObj, CL_TRUE, 0, bytes, C, 0, NULL, NULL);
+    ret = clEnqueueReadBuffer(commandQueue, bMemObj, CL_TRUE, 0, bytes, B, 0, NULL, NULL);
 
     // Write result
-    int i;
-    for (i = 0; i < ARRAY_SIZE; ++i)
-    {
-        printf("%d + %d = %d\n", A[i], B[i], C[i]);
-    }
+    // int i;
+    // for (i = 0; i < ARRAY_SIZE; ++i)
+    // {
+    //     printf("%d + %d = %d\n", A[i], B[i], C[i]);
+    // }
 
     printBoard(A);
     printBoard(B);
-    printBoard(C);
 
     // Clean up, release memory.
     ret = clFlush(commandQueue);
@@ -135,11 +128,9 @@ int main(int argc, char **argv)
     ret = clReleaseProgram(program);
     ret = clReleaseMemObject(aMemObj);
     ret = clReleaseMemObject(bMemObj);
-    ret = clReleaseMemObject(cMemObj);
     ret = clReleaseContext(context);
     free(A);
     free(B);
-    free(C);
 
     return 0;
 }
