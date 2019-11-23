@@ -1,8 +1,8 @@
 #define PROGRAM_FILE "game.cl"
 #define KERNEL_FUNC "game"
 // 24x24 board
-#define ROW_SIZE 5
-#define ARRAY_SIZE 25
+#define ROW_SIZE 4
+#define ARRAY_SIZE 16
 
 #define RAND 0
 
@@ -120,13 +120,11 @@ int main(int argc, char **argv)
 
     // Write result
     int i;
-    for (i = 0; i < SIZE; ++i)
-    {
-        printf("%d + %d = %d\n", A[i], B[i], C[i]);
-    }
-    printBoard(A);
-    printBoard(B);
-    printBoard(C);
+	for (i=0; i<SIZE; ++i) {
+
+		printf("%d + %d = %d\n", A[i], B[i], C[i]);
+
+	}
 
     // Clean up, release memory.
     ret = clFlush(commandQueue);
