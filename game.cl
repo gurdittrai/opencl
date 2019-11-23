@@ -41,16 +41,16 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     int bours = 0;
 
     // check row
-    for (i = (gid - 1); i < (gid + 2); i += 1)
-    {
-        // border
-        int lwr_lim = i < ((y) * row_size);
-        int upp_lim = i > (((y+1) * row_size) - 1);
-        if (lwr_lim || upp_lim)
-            continue;
+    // for (i = (gid - 1); i < (gid + 2); i += 1)
+    // {
+    //     // border
+    //     int lwr_lim = i < ((y) * row_size);
+    //     int upp_lim = i > (((y+1) * row_size) - 1);
+    //     if (lwr_lim || upp_lim)
+    //         continue;
         
-        // bours += a[i];
-    }
+    //     // bours += a[i];
+    // }
 
     for (i = gid - row_size; i < gid + (2*row_size) ; i += row_size)
     {
@@ -58,18 +58,18 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
         {
             continue;
         }
-        // for (j = (i - 1); j < (i + 2); j += 1)
-        // {
-        //     // border
-        //     // int y = (int) i / row_size;
-        //     // int lwr_lim = j < ((y) * row_size);
-        //     // int upp_lim = j > (((y+1) * row_size) - 1);
-        //     // if (lwr_lim || upp_lim)
-        //     //     continue;
+        for (j = (i - 1); j < (i + 2); j += 1)
+        {
+            // border
+            int y = (int) i / row_size;
+            int lwr_lim = j < ((y) * row_size);
+            int upp_lim = j > (((y+1) * row_size) - 1);
+            if (lwr_lim || upp_lim)
+                continue;
             
-        //     bours += 1;
-        // }
-
+            bours += 1;
+        }
+        
         bours += 10;
     }
 
