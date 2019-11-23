@@ -6,22 +6,22 @@ int count_neightbours(int *board, int y, int x, int row_size)
     for (i = y - 1; i < y + 2; i += 1)
     {
         // border
-        if ((i < 0) || (i > 4))
+        if ((i < 0) || (i > row_size-1))
             continue;
 
         for (j = x - 1; j < x + 2; j += 1)
         {
             //border
-            if ((j < 0) || (j > 4))
+            if ((j < 0) || (j > row_size-1))
                 continue;
 
-            if (board[(i * 5) + j] == 1)
+            if (board[(i * row_size) + j] == 1)
                 count += 1;
         }
     }
 
     // -1 itself
-    return count - board[(y * 5) + x];
+    return count
 }
 
 __kernel void game(__global const int *a, __global const int *b, __global int *c)
@@ -30,8 +30,10 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
 
     int y = (int) gid / 4;
     int x = (int) gid % 4;
+    int row_size = (int) get_local_size(0);
 
-    int count = count_neightbours(a, y, x, get_local_size(0));
+    int count = count_neightbours(a, y, x, row_size);
+    count -= a[gid];
 
     c[gid] = (count*100) + (0*10) + a[gid] + b[gid];
 }
