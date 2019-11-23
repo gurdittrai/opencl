@@ -40,7 +40,7 @@ void get_args(int argc, char *argv[], int *output, int *k_cnt)
                 continue;
 
             // get arg (1-6)
-            *k_cnt = argv[i+1][0] - '0';
+            *k_cnt = argv[i + 1][0] - '0';
             if ((*k_cnt < 0) || (*k_cnt > 6))
             {
                 printf("invalid kernel count (default 2 used)\n");
@@ -190,11 +190,8 @@ int main(int argc, char **argv)
         // Read from device back to host.
         ret = clEnqueueReadBuffer(commandQueue, buffer[turnB], CL_TRUE, 0, bytes, board[turnB], 0, NULL, NULL);
 
-        printf("-- Kernal %d --\n", k_iter);
-        if (turnA)
-            printBoard(board[turnA]);
-        if (turnB)
-            printBoard(board[turnB]);
+        printf("-- Kernal %d --\n", k_iter + 1);
+        printBoard(board[turnB]);
 
         // swap buffers
         int temp = turnA;
