@@ -1,4 +1,4 @@
-int count_neightbours(const int *board, int gid, int row_size, int arr_size)
+int count_neightbours(__global const int *board, int gid, int row_size, int arr_size)
 {
     int i, j;
     int count = 0;
