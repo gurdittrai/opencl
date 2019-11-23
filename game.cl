@@ -61,7 +61,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     //         continue;
         
         // check columns beside it
-        for (j = (i - 1); j <= (i + 1); j += 1)
+        for (j = (i - 1); j < (i + 2); j += 1)
         {
             // border
             int lwr_lim = j < ((y) * row_size);
