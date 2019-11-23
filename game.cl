@@ -62,7 +62,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
         }
     }
 
-    // count = count_neightbours(a, gid, row_size, arr_size);
+    count = count_neightbours(a, gid, row_size, arr_size);
 
     c[gid] = (bours * 100) + (count * 10) + a[gid];
 }
