@@ -28,8 +28,8 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
 {
     int gid = get_global_id(0);
 
-    // int y = (int) gid / 4;
-    // int x = (int) gid % 4;
+    int y = (int) gid / 4;
+    int x = (int) gid % 4;
 
-    c[gid] = a[gid] + b[gid];
+    c[gid] = (y*100) + (x*10) + a[gid] + b[gid];
 }
