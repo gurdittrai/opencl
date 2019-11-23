@@ -62,9 +62,7 @@ void printBoard(int *board)
 
 int main(int argc, char **argv)
 {
-
-    int SIZE = ARRAY_SIZE;
-    int bytes = SIZE * sizeof(int);
+    int bytes = ARRAY_SIZE * sizeof(int);
 
     // Allocate memories for input arrays and output array.
     int *A = initBoard(1);
@@ -111,8 +109,8 @@ int main(int argc, char **argv)
     ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&cMemObj);
 
     // Execute the kernel
-    size_t globalItemSize = SIZE;
-    size_t localItemSize = 8; // globalItemSize has to be a multiple of localItemSize. 24/8 = 3
+    size_t globalItemSize = ARRAY_SIZE;
+    size_t localItemSize = ROW_SIZE; // globalItemSize has to be a multiple of localItemSize. 24/8 = 3
     ret = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
 
     // Read from device back to host.
@@ -120,10 +118,10 @@ int main(int argc, char **argv)
 
     // Write result
     int i;
-	for (i=0; i<SIZE; ++i) 
+    for (i = 0; i < ARRAY_SIZE; ++i)
     {
-		printf("%d + %d = %d\n", A[i], B[i], C[i]);
-	}
+        printf("%d + %d = %d\n", A[i], B[i], C[i]);
+    }
 
     printBoard(A);
     printBoard(B);
