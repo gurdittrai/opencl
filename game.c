@@ -25,21 +25,21 @@
 #include "opencl_struct.h"
 
 void insert_shapes(int *board)
-{ 
+{
     int ofs = ROW_SIZE;
     // check
-    board[(0*ofs)+0] = 1;
-    board[(0*ofs)+5] = 0;
-    board[(5*ofs)+0] = 0;
-    board[(5*ofs)+5] = 1;
+    board[(0 * ofs) + 0] = 1;
+    board[(0 * ofs) + 5] = 0;
+    board[(5 * ofs) + 0] = 0;
+    board[(5 * ofs) + 5] = 1;
 
     // toad
-    board[(2*ofs)+2] = 1;
-    board[(2*ofs)+3] = 1;
-    board[(2*ofs)+4] = 1;
-    board[(3*ofs)+1] = 1;
-    board[(3*ofs)+2] = 1;
-    board[(3*ofs)+3] = 1;
+    board[(2 * ofs) + 2] = 1;
+    board[(2 * ofs) + 3] = 1;
+    board[(2 * ofs) + 4] = 1;
+    board[(3 * ofs) + 1] = 1;
+    board[(3 * ofs) + 2] = 1;
+    board[(3 * ofs) + 3] = 1;
 }
 
 int *initBoard(int test)
@@ -89,12 +89,12 @@ int main(int argc, char **argv)
     int bytes = ARRAY_SIZE * sizeof(int);
     int k_cnt = 2;
     int output = 1;
-    int i;
+    int i, turnA = 0, turnB = 1;
     size_t global_size = ARRAY_SIZE;
-    size_t local_size = ROW_SIZE; 
+    size_t local_size = ROW_SIZE;
 
-    // Allocate memories for input arrays and output array.
-    int *A = initBoard(1); printBoard(A);
+    // boards A and B
+    int *A = initBoard(1);
     int *B = malloc(sizeof(int) * ARRAY_SIZE);
 
     // Getting platform and device information
@@ -129,14 +129,23 @@ int main(int argc, char **argv)
     cl_kernel kernel[k_cnt];
     for (i = 0; i < k_cnt; i += 1)
         kernel[i] = clCreateKernel(program, KERNEL_FUNC, &ret);
-    // kernel[1] = clCreateKernel(program, KERNEL_FUNC, &ret);
 
     // Set arguments for kernel
-    ret = clSetKernelArg(kernel[0], 0, sizeof(cl_mem), (void *)&buffer[0]);
-    ret = clSetKernelArg(kernel[0], 1, sizeof(cl_mem), (void *)&buffer[1]);
+    for (i = 0; i < k_cnt; i += 1)
+    {
+        ret = clSetKernelArg(kernel[0], 0, sizeof(cl_mem), (void *)&buffer[turnA]);
+        ret = clSetKernelArg(kernel[0], 1, sizeof(cl_mem), (void *)&buffer[turnB]);
 
-    ret = clSetKernelArg(kernel[1], 0, sizeof(cl_mem), (void *)&buffer[1]);
-    ret = clSetKernelArg(kernel[1], 1, sizeof(cl_mem), (void *)&buffer[0]);
+        // swap buffers
+        int temp = turnA;
+        turnA = turnB;
+        turnB = temp;
+    }
+    // ret = clSetKernelArg(kernel[0], 0, sizeof(cl_mem), (void *)&buffer[0]);
+    // ret = clSetKernelArg(kernel[0], 1, sizeof(cl_mem), (void *)&buffer[1]);
+
+    // ret = clSetKernelArg(kernel[1], 0, sizeof(cl_mem), (void *)&buffer[1]);
+    // ret = clSetKernelArg(kernel[1], 1, sizeof(cl_mem), (void *)&buffer[0]);
 
     // Execute the kernel
     ret = clEnqueueNDRangeKernel(commandQueue, kernel[0], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
@@ -144,8 +153,9 @@ int main(int argc, char **argv)
     // Read from device back to host.
     ret = clEnqueueReadBuffer(commandQueue, buffer[1], CL_TRUE, 0, bytes, B, 0, NULL, NULL);
 
-    printBoard(A); 
-    printBoard(B); printf("--\n");
+    printBoard(A);
+    printBoard(B);
+    printf("--\n");
 
     // Execute the kernel 2
     ret = clEnqueueNDRangeKernel(commandQueue, kernel[1], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
@@ -154,7 +164,8 @@ int main(int argc, char **argv)
     ret = clEnqueueReadBuffer(commandQueue, buffer[0], CL_TRUE, 0, bytes, A, 0, NULL, NULL);
 
     printBoard(A);
-    printBoard(B); printf("--\n");
+    printBoard(B);
+    printf("--\n");
 
     // Write result
     if (output == 1)
