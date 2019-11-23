@@ -29,8 +29,8 @@ void insert_shapes(int *board)
     int ofs = ROW_SIZE;
     // check
     board[(0*ofs)+0] = 1;
-    board[(0*ofs)+5] = 0;
-    board[(5*ofs)+0] = 0;
+    board[(0*ofs)+5] = 1;
+    board[(5*ofs)+0] = 1;
     board[(5*ofs)+5] = 1;
 
     // toad
@@ -87,8 +87,8 @@ int main(int argc, char **argv)
 {
     // initiaze variables
     int bytes = ARRAY_SIZE * sizeof(int);
-    int kernel_cnt = 2;
-    int output = 1;
+    // int kernel_cnt = 2;
+    // int output = 1;
 
     // Allocate memories for input arrays and output array.
     int *A = initBoard(1); printBoard(A);
@@ -140,8 +140,8 @@ int main(int argc, char **argv)
     // Read from device back to host.
     ret = clEnqueueReadBuffer(commandQueue, bMemObj, CL_TRUE, 0, bytes, B, 0, NULL, NULL);
 
-    printBoard(A);
-    printBoard(B);
+    printBoard(A); 
+    printBoard(B); printf("--\n");
 
     // Execute the kernel 2
     ret = clEnqueueNDRangeKernel(commandQueue, kernel2, 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
     ret = clEnqueueReadBuffer(commandQueue, aMemObj, CL_TRUE, 0, bytes, A, 0, NULL, NULL);
 
     printBoard(A);
-    printBoard(B);
+    printBoard(B); printf("--\n");
 
     // Write result
     // int i;
