@@ -53,7 +53,7 @@ void printBoard(int *board)
     {
         for (j = 0; j < ROW_SIZE; j += 1)
         {
-            printf("%3d ", board[i + j]);
+            printf("%04d ", board[i + j]);
         }
         printf("\n");
     }
