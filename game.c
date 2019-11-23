@@ -29,8 +29,8 @@ void insert_shapes(int *board)
     int ofs = ROW_SIZE;
     // check
     board[(0*ofs)+0] = 1;
-    board[(0*ofs)+5] = 1;
-    board[(5*ofs)+0] = 1;
+    board[(0*ofs)+5] = 0;
+    board[(5*ofs)+0] = 0;
     board[(5*ofs)+5] = 1;
 
     // toad
@@ -87,8 +87,9 @@ int main(int argc, char **argv)
 {
     // initiaze variables
     int bytes = ARRAY_SIZE * sizeof(int);
-    // int kernel_cnt = 2;
+    int k_cnt = 2;
     // int output = 1;
+    int i;
 
     // Allocate memories for input arrays and output array.
     int *A = initBoard(1); printBoard(A);
@@ -122,20 +123,22 @@ int main(int argc, char **argv)
     ret = clBuildProgram(program, 1, &deviceID, NULL, NULL, NULL);
 
     // Create kernel
-    cl_kernel kernel = clCreateKernel(program, KERNEL_FUNC, &ret);
-    cl_kernel kernel2 = clCreateKernel(program, KERNEL_FUNC, &ret);
+    cl_kernel kernel[k_cnt];
+    for (i = 0; i < k_cnt; i += 1)
+        kernel[i] = clCreateKernel(program, KERNEL_FUNC, &ret);
+    // kernel[1] = clCreateKernel(program, KERNEL_FUNC, &ret);
 
     // Set arguments for kernel
-    ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&aMemObj);
-    ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&bMemObj);
+    ret = clSetKernelArg(kernel[0], 0, sizeof(cl_mem), (void *)&aMemObj);
+    ret = clSetKernelArg(kernel[0], 1, sizeof(cl_mem), (void *)&bMemObj);
 
-    ret = clSetKernelArg(kernel2, 0, sizeof(cl_mem), (void *)&bMemObj);
-    ret = clSetKernelArg(kernel2, 1, sizeof(cl_mem), (void *)&aMemObj);
+    ret = clSetKernelArg(kernel[1], 0, sizeof(cl_mem), (void *)&bMemObj);
+    ret = clSetKernelArg(kernel[1], 1, sizeof(cl_mem), (void *)&aMemObj);
 
     // Execute the kernel
     size_t globalItemSize = ARRAY_SIZE;
     size_t localItemSize = ROW_SIZE; // globalItemSize has to be a multiple of localItemSize. 24/8 = 3
-    ret = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
+    ret = clEnqueueNDRangeKernel(commandQueue, kernel[0], 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
 
     // Read from device back to host.
     ret = clEnqueueReadBuffer(commandQueue, bMemObj, CL_TRUE, 0, bytes, B, 0, NULL, NULL);
@@ -144,7 +147,7 @@ int main(int argc, char **argv)
     printBoard(B); printf("--\n");
 
     // Execute the kernel 2
-    ret = clEnqueueNDRangeKernel(commandQueue, kernel2, 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
+    ret = clEnqueueNDRangeKernel(commandQueue, kernel[1], 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
 
     // Read from device back to host.
     ret = clEnqueueReadBuffer(commandQueue, aMemObj, CL_TRUE, 0, bytes, A, 0, NULL, NULL);
@@ -163,7 +166,8 @@ int main(int argc, char **argv)
     ret = clFlush(commandQueue);
     ret = clFinish(commandQueue);
     ret = clReleaseCommandQueue(commandQueue);
-    ret = clReleaseKernel(kernel);
+    for (i = 0; i < k_cnt; i += 1)
+        ret = clReleaseKernel(kernel[i]);
     ret = clReleaseProgram(program);
     ret = clReleaseMemObject(aMemObj);
     ret = clReleaseMemObject(bMemObj);
