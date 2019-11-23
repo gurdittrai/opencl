@@ -57,8 +57,8 @@ cl_program build_program(cl_context ctx, cl_device_id device, const char *filena
 
     cl_program program;
     FILE *program_handle;
-    char *program_buffer;
-    size_t program_size;
+    char *program_buffer, *program_log;
+    size_t program_size, log_size;
     int err;
 
     /* Read program file and place content into buffer */
@@ -100,6 +100,17 @@ cl_program build_program(cl_context ctx, cl_device_id device, const char *filena
     if (err < 0)
     {
         perror("Couldn't build the program");
+
+        /* Find size of log and print to std output */
+        clGetProgramBuildInfo(program, dev, CL_PROGRAM_BUILD_LOG, 
+                0, NULL, &log_size);
+        program_log = (char*) malloc(log_size + 1);
+        program_log[log_size] = '\0';
+        clGetProgramBuildInfo(program, dev, CL_PROGRAM_BUILD_LOG, 
+                log_size + 1, program_log, NULL);
+        printf("%s\n", program_log);
+        free(program_log);
+        exit(1);
         exit(1);
     }
 
