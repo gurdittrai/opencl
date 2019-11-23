@@ -31,5 +31,5 @@ __kernel void game(__global const int *board_curr, __global const int *b, __glob
     int y = (int) gid / 4;
     int x = (int) gid % 4;
     
-    board_next[gid] = (y*100)+x;
+    board_next[gid] = gid;
 }
