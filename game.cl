@@ -44,5 +44,5 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     if (agid < 0)
         agid = 1;
 
-    c[gid] = (gid*100) + a[agid];
+    c[gid] = a[gid] + a[agid];
 }
