@@ -29,8 +29,8 @@ void insert_shapes(int *board)
     int ofs = ROW_SIZE;
     // check
     board[(0*ofs)+0] = 1;
-    board[(0*ofs)+5] = 1;
-    board[(5*ofs)+0] = 1;
+    board[(0*ofs)+5] = 0;
+    board[(5*ofs)+0] = 0;
     board[(5*ofs)+5] = 1;
 
     // toad
