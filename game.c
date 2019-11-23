@@ -120,11 +120,14 @@ int main(int argc, char **argv)
 
     // Write result
     int i;
-	for (i=0; i<SIZE; ++i) {
-
+	for (i=0; i<SIZE; ++i) 
+    {
 		printf("%d + %d = %d\n", A[i], B[i], C[i]);
-
 	}
+
+    printBoard(A);
+    printBoard(B);
+    printBoard(C);
 
     // Clean up, release memory.
     ret = clFlush(commandQueue);
