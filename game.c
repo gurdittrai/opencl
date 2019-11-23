@@ -1,8 +1,8 @@
 #define PROGRAM_FILE "game.cl"
 #define KERNEL_FUNC "game"
 // 24x24 board (576 elements)
-#define ROW_SIZE 5
-#define ARRAY_SIZE 25
+#define ROW_SIZE 6
+#define ARRAY_SIZE 36
 
 #define RAND 0
 
@@ -24,6 +24,18 @@
 
 #include "opencl_struct.h"
 
+void insert_shapes(int *board)
+{ 
+    int ofs = ROW_SIZE;
+    // toad
+    board[(2*ofs)+2] = 1;
+    board[(2*ofs)+3] = 1;
+    board[(2*ofs)+4] = 1;
+    board[(3*ofs)+1] = 1;
+    board[(3*ofs)+2] = 1;
+    board[(3*ofs)+3] = 1;
+}
+
 int *initBoard(int test)
 {
     int i, j;
@@ -39,8 +51,13 @@ int *initBoard(int test)
             // int r = ((random() % 100) > 45) ? 0 : 1;
             // board[i + j] = r * RAND;
             // board[i + j] = test * (i + j);
-            board[i + j] = (i + j + test) % 2;
+            board[i + j] = ((i + j + test) % 2) * RAND;
         }
+    }
+
+    if (ARRAY_SIZE == 36)
+    {
+        insert_shapes(board);
     }
 
     return board;
@@ -68,7 +85,7 @@ int main(int argc, char **argv)
     int output = 1;
 
     // Allocate memories for input arrays and output array.
-    int *A = initBoard(1);
+    int *A = initBoard(1); printBoard(A);
     int *B = malloc(sizeof(int) * ARRAY_SIZE);
 
     // Getting platform and device information
