@@ -110,7 +110,7 @@ int main(int argc, char **argv)
 
     // Execute the kernel
     size_t globalItemSize = ARRAY_SIZE;
-    size_t localItemSize = ARRAY_SIZE; // globalItemSize has to be a multiple of localItemSize. 24/8 = 3
+    size_t localItemSize = ROW_SIZE; // globalItemSize has to be a multiple of localItemSize. 24/8 = 3
     ret = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
 
     // Read from device back to host.
