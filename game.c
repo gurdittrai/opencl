@@ -124,21 +124,6 @@ int main(int argc, char **argv)
 		printf("%d + %d = %d\n", A[i], B[i], C[i]);
 
 	}
-	
-
-    // Test if correct answer
-    for (i = 0; i < SIZE; ++i)
-    {
-        if (C[i] != (A[i] + B[i]))
-        {
-            printf("Something didn't work correctly! Failed test. \n");
-            break;
-        }
-    }
-    if (i == SIZE)
-    {
-        printf("Everything seems to work fine! \n");
-    }
 
     // Clean up, release memory.
     ret = clFlush(commandQueue);
