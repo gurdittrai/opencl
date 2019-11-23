@@ -1,28 +1,30 @@
-// int count_neightbours(int *board, int y, int x)
-// {
-//     int count = 0;
+int count_neightbours(int *board, int gid, int row_size, int arr_size)
+{
+    int count = 0;
+    // check rows
+    for (i = gid - row_size; i < gid + (2*row_size) ; i += row_size)
+    {
+        // border
+        if ((i < 0) || (i >= arr_size))
+        {
+            continue;
+        }
 
-//     int i, j;
-//     for (i = y - 1; i < y + 2; i += 1)
-//     {
-//         // border
-//         if ((i < 0) || (i > 4))
-//             continue;
-
-//         for (j = x - 1; j < x + 2; j += 1)
-//         {
-//             //border
-//             if ((j < 0) || (j > 4))
-//                 continue;
-
-//             if (board[(i * 5) + j] == 1)
-//                 count += 1;
-//         }
-//     }
-
-//     // -1 itself
-//     return count - board[(y * 5) + x];
-// }
+        // check columns
+        for (j = (i - 1); j < (i + 2); j += 1)
+        {
+            // border
+            int y = (int) i / row_size;
+            int lwr_lim = j < ((y) * row_size);
+            int upp_lim = j > (((y+1) * row_size) - 1);
+            if (lwr_lim || upp_lim)
+                continue;
+            
+            count += a[j];
+        }
+    }
+    return count;
+}
 
 __kernel void game(__global const int *a, __global const int *b, __global int *c)
 {
@@ -35,23 +37,10 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     int i, j;
     for (i = 0; i < arr_size; i += 1)
     {
-        count += a[i];
+        // count += a[i];
     }
 
     int bours = 0;
-
-    // check row
-    // for (i = (gid - 1); i < (gid + 2); i += 1)
-    // {
-    //     // border
-    //     int lwr_lim = i < ((y) * row_size);
-    //     int upp_lim = i > (((y+1) * row_size) - 1);
-    //     if (lwr_lim || upp_lim)
-    //         continue;
-        
-    //     // bours += a[i];
-    // }
-
     for (i = gid - row_size; i < gid + (2*row_size) ; i += row_size)
     {
         if ((i < 0) || (i >= arr_size))
@@ -70,6 +59,8 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
             bours += a[j];
         }
     }
+
+    count = count_neightbours(a, gid, row_size, arr_size);
 
     c[gid] = (bours * 100) + (count * 10) + a[gid];
 }
