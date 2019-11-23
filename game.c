@@ -133,8 +133,8 @@ int main(int argc, char **argv)
     // Set arguments for kernel
     for (i = 0; i < k_cnt; i += 1)
     {
-        ret = clSetKernelArg(kernel[0], 0, sizeof(cl_mem), (void *)&buffer[turnA]);
-        ret = clSetKernelArg(kernel[0], 1, sizeof(cl_mem), (void *)&buffer[turnB]);
+        ret = clSetKernelArg(kernel[i], 0, sizeof(cl_mem), (void *)&buffer[turnA]);
+        ret = clSetKernelArg(kernel[i], 1, sizeof(cl_mem), (void *)&buffer[turnB]);
 
         // swap buffers
         int temp = turnA;
