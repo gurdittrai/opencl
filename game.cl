@@ -41,7 +41,25 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     }
 
     int bours = 0;
-    
+    if (gid - 1 >= 0) 
+    {
+        bours += a[gid-1];
+    }
 
-    c[gid] = (bours * 100) + (count * 10) + a[gid] + a[agid];
+    if (gid + 1 < row_size) 
+    {
+        bours += a[gid+1];
+    }
+
+    // for (i = (gid - 1); i < (gid + 2); i += 1)
+    // {
+    //     // border
+    //     if ((i < 0) || (i > row_size-1))
+    //         continue;
+
+    //     if (a[i] == 1)
+    //         bours += 1;
+    // }
+
+    c[gid] = (bours * 100) + (count * 10) + a[gid];
 }
