@@ -119,6 +119,11 @@ int main(int argc, char **argv)
     ret = clEnqueueReadBuffer(commandQueue, cMemObj, CL_TRUE, 0, bytes, C, 0, NULL, NULL);
 
     // Write result
+    int i;
+    for (i = 0; i < SIZE; ++i)
+    {
+        printf("%d + %d = %d\n", A[i], B[i], C[i]);
+    }
     printBoard(A);
     printBoard(B);
     printBoard(C);
