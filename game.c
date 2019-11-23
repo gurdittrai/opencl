@@ -72,6 +72,8 @@ int main()
     printBoard(board_1);
     printBoard(board_2);
 
+    // opencl
+
     /* Get Platform and Device Info */
     cl_device_id device = NULL;
     device = create_device();
@@ -84,18 +86,6 @@ int main()
     cl_program program;
     program = build_program(context, device, PROGRAM_FILE);
 
-    /* Create data buffer */
-    cl_int err;
-    size_t global_size = ARRAY_SIZE;
-    // size_t local_size = 4;
-    cl_mem board_1_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, ARRAY_SIZE * sizeof(int), board_1, &err);
-    cl_mem board_2_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, ARRAY_SIZE * sizeof(int), board_2, &err);
-    if (err < 0)
-    {
-        perror("Couldn't create a buffer");
-        exit(1);
-    }
-
     /* Create Command Queue */
     cl_command_queue queue = NULL;
     queue = create_command_queue(context, device);
@@ -104,11 +94,24 @@ int main()
     cl_kernel kernel = NULL;
     kernel = create_kernel(program, KERNEL_FUNC);
 
+    /* Create data buffer */
+    cl_int err;
+    cl_mem board_1_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE, ARRAY_SIZE * sizeof(int), NULL, &err);
+    cl_mem board_2_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE, ARRAY_SIZE * sizeof(int), NULL, &err);
+    if (err < 0)
+    {
+        perror("Couldn't create a buffer");
+        exit(1);
+    }
+
+    /* Write to buffer */
+    err = clEnqueueWriteBuffer(queue, board_1_buffer, CL_TRUE, 0, ARRAY_SIZE * sizeof(int), board_1, 0, NULL, NULL);
+    err = clEnqueueWriteBuffer(queue, board_2_buffer, CL_TRUE, 0, ARRAY_SIZE * sizeof(int), board_2, 0, NULL, NULL);
+    
+
     /* Create kernel arguments */
     err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &board_1_buffer);
-    // err |= clSetKernelArg(kernel, 1, ARRAY_SIZE * sizeof(int), NULL);
     err |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &board_2_buffer);
-    // err |= clSetKernelArg(kernel, 3, ARRAY_SIZE * sizeof(int), NULL);
     if (err < 0)
     {
         perror("Couldn't create a kernel argument");
@@ -116,8 +119,10 @@ int main()
     }
 
     /* Enqueue kernel */
+    size_t global_size = ARRAY_SIZE;
+    size_t local_size = 8;
     err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_size,
-                                 NULL, 0, NULL, NULL);
+                                 &local_size, 0, NULL, NULL);
     if (err < 0)
     {
         perror("Couldn't enqueue the kernel");

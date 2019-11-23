@@ -16,7 +16,7 @@ cl_device_id create_device()
 {
 
     cl_platform_id platform = NULL;
-    cl_device_id dev = NULL;
+    cl_device_id device_id = NULL;
     cl_int err;
 
     /* Identify a platform */
@@ -28,18 +28,14 @@ cl_device_id create_device()
     }
 
     /* Access a device */
-    err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &dev, NULL);
-    if (err == CL_DEVICE_NOT_FOUND)
-    {
-        err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, 1, &dev, NULL);
-    }
+    err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_DEFAULT, 1, &device_id, NULL);
     if (err < 0)
     {
         perror("Couldn't access any devices");
         exit(1);
     }
 
-    return dev;
+    return device_id;
 }
 
 cl_context create_context(cl_device_id device)
@@ -56,13 +52,13 @@ cl_context create_context(cl_device_id device)
 }
 
 /* Create program from a file and compile it */
-cl_program build_program(cl_context ctx, cl_device_id dev, const char *filename)
+cl_program build_program(cl_context ctx, cl_device_id device, const char *filename)
 {
 
     cl_program program;
     FILE *program_handle;
-    char *program_buffer, *program_log;
-    size_t program_size, log_size;
+    char *program_buffer;
+    size_t program_size;
     int err;
 
     /* Read program file and place content into buffer */
@@ -100,19 +96,10 @@ cl_program build_program(cl_context ctx, cl_device_id dev, const char *filename)
     free(program_buffer);
 
     /* Build program */
-    err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
+    err = clBuildProgram(program, 1, &device, NULL, NULL, NULL);
     if (err < 0)
     {
-
-        /* Find size of log and print to std output */
-        clGetProgramBuildInfo(program, dev, CL_PROGRAM_BUILD_LOG,
-                              0, NULL, &log_size);
-        program_log = (char *)malloc(log_size + 1);
-        program_log[log_size] = '\0';
-        clGetProgramBuildInfo(program, dev, CL_PROGRAM_BUILD_LOG,
-                              log_size + 1, program_log, NULL);
-        printf("%s\n", program_log);
-        free(program_log);
+        perror("Couldn't build the program");
         exit(1);
     }
 
