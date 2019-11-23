@@ -87,9 +87,9 @@ int main(int argc, char **argv)
     cl_command_queue commandQueue = clCreateCommandQueueWithProperties(context, deviceID, 0, &ret);
 
     // Memory buffers for each array
-    cl_mem aMemObj = clCreateBuffer(context, CL_MEM_READ_ONLY, bytes, NULL, &ret);
-    cl_mem bMemObj = clCreateBuffer(context, CL_MEM_READ_ONLY, bytes, NULL, &ret);
-    cl_mem cMemObj = clCreateBuffer(context, CL_MEM_WRITE_ONLY, bytes, NULL, &ret);
+    cl_mem aMemObj = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
+    cl_mem bMemObj = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
+    cl_mem cMemObj = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
 
     // Copy lists to memory buffers
     ret = clEnqueueWriteBuffer(commandQueue, aMemObj, CL_TRUE, 0, bytes, A, 0, NULL, NULL);
@@ -97,9 +97,6 @@ int main(int argc, char **argv)
 
     // create program
     cl_program program = build_program(context, deviceID, PROGRAM_FILE);
-
-    // Create program from kernel source
-    //cl_program program = clCreateProgramWithSource(context, 1, (const char **)&kernelSource, (const size_t *)&kernelSize, &ret);
 
     // Build program
     ret = clBuildProgram(program, 1, &deviceID, NULL, NULL, NULL);
