@@ -30,16 +30,17 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
 
     int y = (int)gid / 4;
     int x = (int)gid % 4;
+    int arr_size = get_global_size(0);
     int row_size = get_local_size(0);
     int count = 0;
 
     int i;
     int j;
-    for (i = 0; i < row_size; i += 1)
+    for (i = 0; i < arr_size; i += 1)
     {
         count += a[i];
     }
-    for (j = 0; j < row_size; j += 1)
+    for (j = 0; j < arr_size; j += 1)
     {
         count += b[i];
     }
