@@ -33,10 +33,14 @@ __kernel void game(__global const int *board_curr, __global const int *b, __glob
 
     int count = 0;
 
-    if (board_curr[gid-1] == 1)
-        count += 1;
-    if (board_curr[gid+1] == 1)
-        count += 1;
+    int i;
+    for (i = 0; i < get_global_size(); i += 1)
+    {
+        if (board_curr[i] == 1)
+            count += 1;
+    }
+
+    
 
     // int i, j;
     // for (i = y - 1; i < y + 2; i += 1)
@@ -56,5 +60,5 @@ __kernel void game(__global const int *board_curr, __global const int *b, __glob
     //     }
     // }
 
-    board_next[gid] = count - board_curr[gid];
+    board_next[gid] = (count*1000)+get_global_size();
 }
