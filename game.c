@@ -149,7 +149,7 @@ int main(int argc, char **argv)
     for (i = 0; i < 10; i += 1, k_iter += 1)
     {
         // reset iter
-        if (k_iter > k_cnt)
+        if (k_iter >= k_cnt)
         {
             k_iter = 0;
         }
