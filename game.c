@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 #include <ncurses.h>
 #include <unistd.h>
@@ -23,6 +24,31 @@
 #endif
 
 #include "opencl_struct.h"
+
+void get_args(int argc, char *argv[], int *output, int *k_cnt)
+{
+    for (int i = 1; i < argc; i += 1)
+    {
+        if (strcmp(argv[i], "-o") == 0)
+        {
+            *output = 1;
+        }
+        else if (strcmp(argv[i], "-k") == 0)
+        {
+            // check count arg exists
+            if (i + 1 > argc)
+                continue;
+
+            // get arg (1-6)
+            *k_cnt = argv[i+1][0] - '0';
+            if ((*k_cnt < 0) || (*k_cnt > 6))
+            {
+                printf("invalid kernel count (default 2 used)\n");
+                *k_cnt = 2;
+            }
+        }
+    }
+}
 
 void insert_shapes(int *board)
 {
@@ -94,9 +120,13 @@ int main(int argc, char **argv)
     size_t local_size = ROW_SIZE;
 
     // boards A and B
-    int **board = malloc(sizeof(int*) * 2);
+    int **board = malloc(sizeof(int *) * 2);
     board[0] = initBoard(1);
     board[1] = malloc(sizeof(int) * ARRAY_SIZE);
+
+    // get args
+    get_args(argc, argv, &output, &k_cnt);
+    printf("kernal count %d\n output %d\n", k_cnt, output);
 
     // Getting platform and device information
     cl_platform_id platformId = NULL;
@@ -161,8 +191,10 @@ int main(int argc, char **argv)
         ret = clEnqueueReadBuffer(commandQueue, buffer[turnB], CL_TRUE, 0, bytes, board[turnB], 0, NULL, NULL);
 
         printf("-- Kernal %d --\n", k_iter);
-        printBoard(board[turnA]);
-        printBoard(board[turnB]);
+        if (turnA)
+            printBoard(board[turnA]);
+        if (turnB)
+            printBoard(board[turnB]);
 
         // swap buffers
         int temp = turnA;
