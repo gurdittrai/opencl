@@ -1,8 +1,8 @@
 #define PROGRAM_FILE "game.cl"
 #define KERNEL_FUNC "game"
 // 24x24 board (576 elements)
-#define ROW_SIZE 24
-#define ARRAY_SIZE 576
+#define ROW_SIZE 5
+#define ARRAY_SIZE 25
 
 #define RAND 0
 
@@ -100,10 +100,14 @@ int main(int argc, char **argv)
 
     // Create kernel
     cl_kernel kernel = clCreateKernel(program, KERNEL_FUNC, &ret);
+    cl_kernel kernel2 = clCreateKernel(program, KERNEL_FUNC, &ret);
 
     // Set arguments for kernel
     ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&aMemObj);
     ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&bMemObj);
+
+    ret = clSetKernelArg(kernel2, 0, sizeof(cl_mem), (void *)&bMemObj);
+    ret = clSetKernelArg(kernel2, 1, sizeof(cl_mem), (void *)&aMemObj);
 
     // Execute the kernel
     size_t globalItemSize = ARRAY_SIZE;
@@ -113,15 +117,24 @@ int main(int argc, char **argv)
     // Read from device back to host.
     ret = clEnqueueReadBuffer(commandQueue, bMemObj, CL_TRUE, 0, bytes, B, 0, NULL, NULL);
 
+    printBoard(A);
+    printBoard(B);
+
+    // Execute the kernel 2
+    ret = clEnqueueNDRangeKernel(commandQueue, kernel2, 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
+
+    // Read from device back to host.
+    ret = clEnqueueReadBuffer(commandQueue, aMemObj, CL_TRUE, 0, bytes, A, 0, NULL, NULL);
+
+    printBoard(A);
+    printBoard(B);
+
     // Write result
     // int i;
     // for (i = 0; i < ARRAY_SIZE; ++i)
     // {
     //     printf("%d + %d = %d\n", A[i], B[i], C[i]);
     // }
-
-    printBoard(A);
-    printBoard(B);
 
     // Clean up, release memory.
     ret = clFlush(commandQueue);
