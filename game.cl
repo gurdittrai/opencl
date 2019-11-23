@@ -6,13 +6,13 @@ int count_neightbours(int *board, int y, int x)
     for (i = y - 1; i < y + 2; i += 1)
     {
         // border
-        if ((i < 0) || (i > 23))
+        if ((i < 0) || (i > 3))
             continue;
 
         for (j = x - 1; j < x + 2; j += 1)
         {
             //border
-            if ((j < 0) || (j > 23))
+            if ((j < 0) || (j > 3))
                 continue;
 
             if (board[(i*4)+j] == 1)
