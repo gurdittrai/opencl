@@ -143,35 +143,31 @@ int main(int argc, char **argv)
         turnB = temp;
     }
 
+    int k_iter = 0;
     turnA = 0;
     turnB = 1;
-    for (i = 0; i < 10; i += 1)
+    for (i = 0; i < 10; i += 1, k_iter += 1)
     {
+        // reset iter
+        if (k_iter > k_cnt)
+        {
+            k_iter = 0;
+        }
+
         // Execute the kernel
-        ret = clEnqueueNDRangeKernel(commandQueue, kernel[turnA], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
+        ret = clEnqueueNDRangeKernel(commandQueue, kernel[k_iter], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
 
         // Read from device back to host.
         ret = clEnqueueReadBuffer(commandQueue, buffer[turnB], CL_TRUE, 0, bytes, board[turnB], 0, NULL, NULL);
 
+        printf("-- Kernal %d --\n", k_iter);
         printBoard(board[turnA]);
         printBoard(board[turnB]);
-        printf("--\n");
 
         // swap buffers
         int temp = turnA;
         turnA = turnB;
         turnB = temp;
-
-        // // Execute the kernel 2
-        // ret = clEnqueueNDRangeKernel(commandQueue, kernel[1], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
-
-        // // Read from device back to host.
-        // ret = clEnqueueReadBuffer(commandQueue, buffer[0], CL_TRUE, 0, bytes, A, 0, NULL, NULL);
-
-        // printBoard(A);
-        // printBoard(B);
-        // printf("--\n");
-
     }
 
     // Write result
