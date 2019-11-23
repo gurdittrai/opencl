@@ -76,7 +76,7 @@ void printBoard(int *board)
     {
         for (j = 0; j < ROW_SIZE; j += 1)
         {
-            printf("%03d ", board[i + j]);
+            printf("%3d ", board[i + j]);
         }
         printf("\n");
     }
@@ -94,8 +94,9 @@ int main(int argc, char **argv)
     size_t local_size = ROW_SIZE;
 
     // boards A and B
-    int *A = initBoard(1);
-    int *B = malloc(sizeof(int) * ARRAY_SIZE);
+    int **board = malloc(sizeof(int*) * 2);
+    board[0] = initBoard(1);
+    board[1] = malloc(sizeof(int) * ARRAY_SIZE);
 
     // Getting platform and device information
     cl_platform_id platformId = NULL;
@@ -117,7 +118,7 @@ int main(int argc, char **argv)
     buffer[1] = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
 
     // Copy lists to memory buffers
-    ret = clEnqueueWriteBuffer(commandQueue, buffer[0], CL_TRUE, 0, bytes, A, 0, NULL, NULL);
+    ret = clEnqueueWriteBuffer(commandQueue, buffer[0], CL_TRUE, 0, bytes, board[0], 0, NULL, NULL);
 
     // create program
     cl_program program = build_program(context, deviceID, PROGRAM_FILE);
@@ -141,31 +142,37 @@ int main(int argc, char **argv)
         turnA = turnB;
         turnB = temp;
     }
-    // ret = clSetKernelArg(kernel[0], 0, sizeof(cl_mem), (void *)&buffer[0]);
-    // ret = clSetKernelArg(kernel[0], 1, sizeof(cl_mem), (void *)&buffer[1]);
 
-    // ret = clSetKernelArg(kernel[1], 0, sizeof(cl_mem), (void *)&buffer[1]);
-    // ret = clSetKernelArg(kernel[1], 1, sizeof(cl_mem), (void *)&buffer[0]);
+    turnA = 0;
+    turnB = 1;
+    for (i = 0; i < 10; i += 1)
+    {
+        // Execute the kernel
+        ret = clEnqueueNDRangeKernel(commandQueue, kernel[turnA], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
 
-    // Execute the kernel
-    ret = clEnqueueNDRangeKernel(commandQueue, kernel[0], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
+        // Read from device back to host.
+        ret = clEnqueueReadBuffer(commandQueue, buffer[turnB], CL_TRUE, 0, bytes, board[turnB], 0, NULL, NULL);
 
-    // Read from device back to host.
-    ret = clEnqueueReadBuffer(commandQueue, buffer[1], CL_TRUE, 0, bytes, B, 0, NULL, NULL);
+        printBoard(board[turnA]);
+        printBoard(board[turnB]);
+        printf("--\n");
 
-    printBoard(A);
-    printBoard(B);
-    printf("--\n");
+        // swap buffers
+        int temp = turnA;
+        turnA = turnB;
+        turnB = temp;
 
-    // Execute the kernel 2
-    ret = clEnqueueNDRangeKernel(commandQueue, kernel[1], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
+        // // Execute the kernel 2
+        // ret = clEnqueueNDRangeKernel(commandQueue, kernel[1], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
 
-    // Read from device back to host.
-    ret = clEnqueueReadBuffer(commandQueue, buffer[0], CL_TRUE, 0, bytes, A, 0, NULL, NULL);
+        // // Read from device back to host.
+        // ret = clEnqueueReadBuffer(commandQueue, buffer[0], CL_TRUE, 0, bytes, A, 0, NULL, NULL);
 
-    printBoard(A);
-    printBoard(B);
-    printf("--\n");
+        // printBoard(A);
+        // printBoard(B);
+        // printf("--\n");
+
+    }
 
     // Write result
     if (output == 1)
@@ -181,8 +188,9 @@ int main(int argc, char **argv)
     ret = clReleaseMemObject(buffer[0]);
     ret = clReleaseMemObject(buffer[1]);
     ret = clReleaseContext(context);
-    free(A);
-    free(B);
+    free(board[0]);
+    free(board[1]);
+    free(board);
 
     return 0;
 }
