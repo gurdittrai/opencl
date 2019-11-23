@@ -81,19 +81,19 @@ int main(int argc, char **argv)
 
     // Load kernel from file vecAddKernel.cl
 
-    FILE *kernelFile;
-    char *kernelSource;
-    size_t kernelSize;
+    // FILE *kernelFile;
+    // char *kernelSource;
+    // size_t kernelSize;
 
-    kernelFile = fopen("vecAddKernel.cl", "r");
+    // kernelFile = fopen("vecAddKernel.cl", "r");
 
-    if (!kernelFile)
-    {
+    // if (!kernelFile)
+    // {
 
-        fprintf(stderr, "No file named vecAddKernel.cl was found\n");
+    //     fprintf(stderr, "No file named vecAddKernel.cl was found\n");
 
-        exit(-1);
-    }
+    //     exit(-1);
+    // }
     // kernelSource = (char *)malloc(MAX_SOURCE_SIZE);
     // kernelSize = fread(kernelSource, 1, MAX_SOURCE_SIZE, kernelFile);
     // fclose(kernelFile);
