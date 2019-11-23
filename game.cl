@@ -51,20 +51,15 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     //     bours += a[gid+1];
     // }
 
-    for (i = (y - 1); i < (y + 2); i += 1)
+    for (i = (gid - 1); i < (gid + 2); i += 1)
     {
         // border
-        if ((i < 0) || (i > row_size - 1))
+        int lwr_lim = i < ((y) * row_size);
+        int upp_lim = i > (((y+1) * row_size) - 1);
+        if (lwr_lim || upp_lim)
             continue;
         
-        for (j = (x - 1); j < (x + 2); j += 1)
-        {
-            // border
-            if ((j < 0) || (j > row_size - 1))
-                continue;
-
-            bours += 1;
-        }
+        bours += 1;
     }
 
     c[gid] = (bours * 100) + (count * 10) + a[gid];
