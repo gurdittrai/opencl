@@ -1,8 +1,8 @@
 #define PROGRAM_FILE "game.cl"
 #define KERNEL_FUNC "game"
 // 24x24 board
-#define ROW_SIZE 4
-#define ARRAY_SIZE 16
+#define ROW_SIZE 5
+#define ARRAY_SIZE 25
 
 #define RAND 0
 
