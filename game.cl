@@ -58,17 +58,19 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
         {
             continue;
         }
-        for (j = (i - 1); j < (i + 2); j += 1)
-        {
-            // border
-            // int y = (int) i / row_size;
-            // int lwr_lim = j < ((y) * row_size);
-            // int upp_lim = j > (((y+1) * row_size) - 1);
-            // if (lwr_lim || upp_lim)
-            //     continue;
+        // for (j = (i - 1); j < (i + 2); j += 1)
+        // {
+        //     // border
+        //     // int y = (int) i / row_size;
+        //     // int lwr_lim = j < ((y) * row_size);
+        //     // int upp_lim = j > (((y+1) * row_size) - 1);
+        //     // if (lwr_lim || upp_lim)
+        //     //     continue;
             
-            bours += 1;
-        }
+        //     bours += 1;
+        // }
+
+        bours += 10;
     }
 
     c[gid] = (bours * 100) + (count * 10) + a[gid];
