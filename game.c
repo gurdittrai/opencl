@@ -112,11 +112,12 @@ int main(int argc, char **argv)
     cl_command_queue commandQueue = clCreateCommandQueueWithProperties(context, deviceID, 0, &ret);
 
     // Memory buffers for each array
-    cl_mem aMemObj = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
-    cl_mem bMemObj = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
+    cl_mem buffer[2];
+    buffer[0] = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
+    buffer[1] = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
 
     // Copy lists to memory buffers
-    ret = clEnqueueWriteBuffer(commandQueue, aMemObj, CL_TRUE, 0, bytes, A, 0, NULL, NULL);
+    ret = clEnqueueWriteBuffer(commandQueue, buffer[0], CL_TRUE, 0, bytes, A, 0, NULL, NULL);
 
     // create program
     cl_program program = build_program(context, deviceID, PROGRAM_FILE);
@@ -131,17 +132,17 @@ int main(int argc, char **argv)
     // kernel[1] = clCreateKernel(program, KERNEL_FUNC, &ret);
 
     // Set arguments for kernel
-    ret = clSetKernelArg(kernel[0], 0, sizeof(cl_mem), (void *)&aMemObj);
-    ret = clSetKernelArg(kernel[0], 1, sizeof(cl_mem), (void *)&bMemObj);
+    ret = clSetKernelArg(kernel[0], 0, sizeof(cl_mem), (void *)&buffer[0]);
+    ret = clSetKernelArg(kernel[0], 1, sizeof(cl_mem), (void *)&buffer[1]);
 
-    ret = clSetKernelArg(kernel[1], 0, sizeof(cl_mem), (void *)&bMemObj);
-    ret = clSetKernelArg(kernel[1], 1, sizeof(cl_mem), (void *)&aMemObj);
+    ret = clSetKernelArg(kernel[1], 0, sizeof(cl_mem), (void *)&buffer[1]);
+    ret = clSetKernelArg(kernel[1], 1, sizeof(cl_mem), (void *)&buffer[0]);
 
     // Execute the kernel
     ret = clEnqueueNDRangeKernel(commandQueue, kernel[0], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
 
     // Read from device back to host.
-    ret = clEnqueueReadBuffer(commandQueue, bMemObj, CL_TRUE, 0, bytes, B, 0, NULL, NULL);
+    ret = clEnqueueReadBuffer(commandQueue, buffer[1], CL_TRUE, 0, bytes, B, 0, NULL, NULL);
 
     printBoard(A); 
     printBoard(B); printf("--\n");
@@ -150,7 +151,7 @@ int main(int argc, char **argv)
     ret = clEnqueueNDRangeKernel(commandQueue, kernel[1], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
 
     // Read from device back to host.
-    ret = clEnqueueReadBuffer(commandQueue, aMemObj, CL_TRUE, 0, bytes, A, 0, NULL, NULL);
+    ret = clEnqueueReadBuffer(commandQueue, buffer[0], CL_TRUE, 0, bytes, A, 0, NULL, NULL);
 
     printBoard(A);
     printBoard(B); printf("--\n");
@@ -166,8 +167,8 @@ int main(int argc, char **argv)
     for (i = 0; i < k_cnt; i += 1)
         ret = clReleaseKernel(kernel[i]);
     ret = clReleaseProgram(program);
-    ret = clReleaseMemObject(aMemObj);
-    ret = clReleaseMemObject(bMemObj);
+    ret = clReleaseMemObject(buffer[0]);
+    ret = clReleaseMemObject(buffer[1]);
     ret = clReleaseContext(context);
     free(A);
     free(B);
