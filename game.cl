@@ -61,7 +61,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     //         continue;
         
         // check columns beside it
-        for (j = (i - 1); j < (i + 2); j += 1)
+        for (j = (gid - 1); j <= (gid + 1); j += 1)
         {
             // border
             int lwr_lim = j < ((y) * row_size);
@@ -69,7 +69,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
             if (lwr_lim || upp_lim)
                 continue;
             
-            bours += 1;
+            bours += a[i];
         }
     // }
 
