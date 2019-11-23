@@ -56,5 +56,5 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     count = count_neighbours(a, gid, row_size, arr_size);
 
     // updated value on new board
-    c[gid] = update_value(a[gid], count);
+    c[gid] = (count*100) + update_value(a[gid], count);
 }
