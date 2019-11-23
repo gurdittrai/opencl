@@ -63,11 +63,11 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
         bours += a[i];
     }
 
-    if ((gid - row_size) > 0)
+    if ((gid - row_size) >= 0)
     {
         bours += 10;
     }
-    if ((gid + row_size) > 0)
+    if ((gid + row_size) < arr_size)
     {
         bours += 10;
     }
