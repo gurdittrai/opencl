@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     int *B = initBoard(0);
 
     // Output
-    int *C = initBoard(0);
+    int *C = malloc(sizeof(int) * ARRAY_SIZE);
 
     // Getting platform and device information
     cl_platform_id platformId = NULL;
