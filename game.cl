@@ -32,7 +32,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     int row_size = get_local_size(0);
     int count = 0;
 
-    int i;
+    int i, j;
     for (i = 0; i < arr_size; i += 1)
     {
         count += a[i];
