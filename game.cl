@@ -1,8 +1,5 @@
-__kernel void game_simulation(__global int *board_curr, __global int *board_next)
+__kernel void game(__global const float *a, __global const float *b, __global float *c)
 {
-    uint global_addr;
-    global_addr = get_global_id(0);
-
-    if (board_curr[global_addr] % 2)
-        board_next[global_addr] = board_curr[global_addr] * 2;
+    int gid = get_global_id(0);
+    c[gid] = a[gid] + b[gid];
 }

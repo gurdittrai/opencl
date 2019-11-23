@@ -1,5 +1,5 @@
 #define PROGRAM_FILE "game.cl"
-#define KERNEL_FUNC "game_simulation"
+#define KERNEL_FUNC "game"
 // 24x24 board
 #define ROW_SIZE 4
 #define ARRAY_SIZE 16
@@ -59,95 +59,129 @@ void printBoard(int *board)
     printf("\n");
 }
 
-int main()
+int main(int argc, char **argv)
 {
-    // board
-    int *board_1;
-    int *board_2;
 
-    // initailize board
-    board_1 = initBoard(1);
-    board_2 = initBoard(0);
+    int SIZE = 1024;
 
-    printBoard(board_1);
-    printBoard(board_2);
+    // Allocate memories for input arrays and output array.
+    float *A = (float *)malloc(sizeof(float) * SIZE);
+    float *B = (float *)malloc(sizeof(float) * SIZE);
 
-    // opencl
+    // Output
+    float *C = (float *)malloc(sizeof(float) * SIZE);
 
-    /* Get Platform and Device Info */
-    cl_device_id device = NULL;
-    device = create_device();
-
-    /* Create OpenCL context */
-    cl_context context = NULL;
-    context = create_context(device);
-
-    /* Build program */
-    cl_program program;
-    program = build_program(context, device, PROGRAM_FILE);
-
-    /* Create Command Queue */
-    cl_command_queue queue = NULL;
-    queue = create_command_queue(context, device);
-
-    /* Create a kernel */
-    cl_kernel kernel = NULL;
-    kernel = create_kernel(program, KERNEL_FUNC);
-
-    /* Create data buffer */
-    cl_int err;
-    cl_mem board_1_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE, ARRAY_SIZE * sizeof(int), NULL, &err);
-    cl_mem board_2_buffer = clCreateBuffer(context, CL_MEM_READ_WRITE, ARRAY_SIZE * sizeof(int), NULL, &err);
-    if (err < 0)
+    // Initialize values for array members.
+    int i = 0;
+    for (i = 0; i < SIZE; ++i)
     {
-        perror("Couldn't create a buffer");
-        exit(1);
+        A[i] = i + 1;
+        B[i] = (i + 1) * 2;
     }
 
-    /* Write to buffer */
-    err = clEnqueueWriteBuffer(queue, board_1_buffer, CL_TRUE, 0, ARRAY_SIZE * sizeof(int), board_1, 0, NULL, NULL);
-    err = clEnqueueWriteBuffer(queue, board_2_buffer, CL_TRUE, 0, ARRAY_SIZE * sizeof(int), board_2, 0, NULL, NULL);
-    
+    // Load kernel from file vecAddKernel.cl
 
-    /* Create kernel arguments */
-    err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &board_1_buffer);
-    err |= clSetKernelArg(kernel, 1, sizeof(cl_mem), &board_2_buffer);
-    if (err < 0)
+    FILE *kernelFile;
+    char *kernelSource;
+    size_t kernelSize;
+
+    kernelFile = fopen("vecAddKernel.cl", "r");
+
+    if (!kernelFile)
     {
-        perror("Couldn't create a kernel argument");
-        exit(1);
+
+        fprintf(stderr, "No file named vecAddKernel.cl was found\n");
+
+        exit(-1);
+    }
+    // kernelSource = (char *)malloc(MAX_SOURCE_SIZE);
+    // kernelSize = fread(kernelSource, 1, MAX_SOURCE_SIZE, kernelFile);
+    // fclose(kernelFile);
+
+    // Getting platform and device information
+    cl_platform_id platformId = NULL;
+    cl_device_id deviceID = NULL;
+    cl_uint retNumDevices;
+    cl_uint retNumPlatforms;
+    cl_int ret = clGetPlatformIDs(1, &platformId, &retNumPlatforms);
+    ret = clGetDeviceIDs(platformId, CL_DEVICE_TYPE_DEFAULT, 1, &deviceID, &retNumDevices);
+
+    // Creating context.
+    cl_context context = clCreateContext(NULL, 1, &deviceID, NULL, NULL, &ret);
+
+    // Creating command queue
+    cl_command_queue commandQueue = clCreateCommandQueueWithProperties(context, deviceID, 0, &ret);
+
+    // Memory buffers for each array
+    cl_mem aMemObj = clCreateBuffer(context, CL_MEM_READ_ONLY, SIZE * sizeof(float), NULL, &ret);
+    cl_mem bMemObj = clCreateBuffer(context, CL_MEM_READ_ONLY, SIZE * sizeof(float), NULL, &ret);
+    cl_mem cMemObj = clCreateBuffer(context, CL_MEM_WRITE_ONLY, SIZE * sizeof(float), NULL, &ret);
+
+    // Copy lists to memory buffers
+    ret = clEnqueueWriteBuffer(commandQueue, aMemObj, CL_TRUE, 0, SIZE * sizeof(float), A, 0, NULL, NULL);
+    ret = clEnqueueWriteBuffer(commandQueue, bMemObj, CL_TRUE, 0, SIZE * sizeof(float), B, 0, NULL, NULL);
+
+    // create program
+    cl_program program = build_program(context, deviceID, PROGRAM_FILE);
+
+    // Create program from kernel source
+    //cl_program program = clCreateProgramWithSource(context, 1, (const char **)&kernelSource, (const size_t *)&kernelSize, &ret);
+
+    // Build program
+    ret = clBuildProgram(program, 1, &deviceID, NULL, NULL, NULL);
+
+    // Create kernel
+    cl_kernel kernel = clCreateKernel(program, KERNEL_FUNC, &ret);
+
+    // Set arguments for kernel
+    ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&aMemObj);
+    ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&bMemObj);
+    ret = clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&cMemObj);
+
+    // Execute the kernel
+    size_t globalItemSize = SIZE;
+    size_t localItemSize = 64; // globalItemSize has to be a multiple of localItemSize. 1024/64 = 16
+    ret = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
+
+    // Read from device back to host.
+    ret = clEnqueueReadBuffer(commandQueue, cMemObj, CL_TRUE, 0, SIZE * sizeof(float), C, 0, NULL, NULL);
+
+    // Write result
+    /*
+	for (i=0; i<SIZE; ++i) {
+
+		printf("%f + %f = %f\n", A[i], B[i], C[i]);
+
+	}
+	*/
+
+    // Test if correct answer
+    for (i = 0; i < SIZE; ++i)
+    {
+        if (C[i] != (A[i] + B[i]))
+        {
+            printf("Something didn't work correctly! Failed test. \n");
+            break;
+        }
+    }
+    if (i == SIZE)
+    {
+        printf("Everything seems to work fine! \n");
     }
 
-    /* Enqueue kernel */
-    size_t global_size = ARRAY_SIZE;
-    size_t local_size = 8;
-    err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_size,
-                                 &local_size, 0, NULL, NULL);
-    if (err < 0)
-    {
-        perror("Couldn't enqueue the kernel");
-        exit(1);
-    }
-
-    /* Read the kernel's output */
-    err = clEnqueueReadBuffer(queue, board_2_buffer, CL_TRUE, 1,
-                              ARRAY_SIZE * sizeof(int), board_2, 0, NULL, NULL);
-    if (err < 0)
-    {
-        perror("Couldn't read the buffer");
-        exit(1);
-    }
-
-    printBoard(board_1);
-    printBoard(board_2);
-
-    /* Deallocate resources */
-    clReleaseKernel(kernel);
-    clReleaseMemObject(board_1_buffer);
-    clReleaseMemObject(board_2_buffer);
-    clReleaseCommandQueue(queue);
-    clReleaseProgram(program);
-    clReleaseContext(context);
+    // Clean up, release memory.
+    ret = clFlush(commandQueue);
+    ret = clFinish(commandQueue);
+    ret = clReleaseCommandQueue(commandQueue);
+    ret = clReleaseKernel(kernel);
+    ret = clReleaseProgram(program);
+    ret = clReleaseMemObject(aMemObj);
+    ret = clReleaseMemObject(bMemObj);
+    ret = clReleaseMemObject(cMemObj);
+    ret = clReleaseContext(context);
+    free(A);
+    free(B);
+    free(C);
 
     return 0;
 }
