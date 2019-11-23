@@ -38,7 +38,8 @@ int *initBoard(int test)
             //random
             // int r = ((random() % 100) > 45) ? 0 : 1;
             // board[i + j] = r * RAND;
-            board[i + j] = test * (i + j);
+            // board[i + j] = test * (i + j);
+            board[i + j] = (i + j) % 2;
         }
     }
 
