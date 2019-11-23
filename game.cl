@@ -72,13 +72,13 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
         for (j = (i - 1); j < (i + 2); j += 1)
         {
             // border
-            int y = (int) gid / row_size;
+            int y = (int) i / row_size;
             int lwr_lim = j < ((y) * row_size);
             int upp_lim = j > (((y+1) * row_size) - 1);
             if (lwr_lim || upp_lim)
                 continue;
             
-            bours += a[j];
+            bours += 1;
         }
     }
 
