@@ -35,7 +35,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     int count = 0;
 
     int i;
-    for (i = 0; i < row_size; i += 1)
+    for (i = 0; i < arr_size; i += 1)
     {
         count += a[i];
     }
