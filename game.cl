@@ -40,7 +40,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     {
         // count += a[i];
     }
-
+    
     int bours = 0;
     for (i = gid - row_size; i < gid + (2*row_size) ; i += row_size)
     {
@@ -61,7 +61,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
         }
     }
 
-    count = count_neightbours(a, gid, row_size, arr_size);
+    int count = count_neightbours(a, gid, row_size, arr_size);
 
     c[gid] = (bours * 100) + (count * 10) + a[gid];
 }
