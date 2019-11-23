@@ -72,7 +72,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
         // bours += 10;
     }
 
-    for (i = gid - row_size; i < gid + (2*row_size) ; i += row_size)
+    for (i = gid - row_size; i < (gid + (2*row_size))-1 ; i += row_size)
     {
         if (i < 0)
         {
