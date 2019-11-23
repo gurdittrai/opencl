@@ -62,41 +62,14 @@ void printBoard(int *board)
 int main(int argc, char **argv)
 {
 
-    int SIZE = 1024;
+    int SIZE = ARRAY_SIZE;
 
     // Allocate memories for input arrays and output array.
-    float *A = (float *)malloc(sizeof(float) * SIZE);
-    float *B = (float *)malloc(sizeof(float) * SIZE);
+    int *A = initBoard(1);
+    int *B = initBoard(0);
 
     // Output
-    float *C = (float *)malloc(sizeof(float) * SIZE);
-
-    // Initialize values for array members.
-    int i = 0;
-    for (i = 0; i < SIZE; ++i)
-    {
-        A[i] = i + 1;
-        B[i] = (i + 1) * 2;
-    }
-
-    // Load kernel from file vecAddKernel.cl
-
-    // FILE *kernelFile;
-    // char *kernelSource;
-    // size_t kernelSize;
-
-    // kernelFile = fopen("vecAddKernel.cl", "r");
-
-    // if (!kernelFile)
-    // {
-
-    //     fprintf(stderr, "No file named vecAddKernel.cl was found\n");
-
-    //     exit(-1);
-    // }
-    // kernelSource = (char *)malloc(MAX_SOURCE_SIZE);
-    // kernelSize = fread(kernelSource, 1, MAX_SOURCE_SIZE, kernelFile);
-    // fclose(kernelFile);
+    int *C = initBoard(0);
 
     // Getting platform and device information
     cl_platform_id platformId = NULL;
@@ -140,20 +113,20 @@ int main(int argc, char **argv)
 
     // Execute the kernel
     size_t globalItemSize = SIZE;
-    size_t localItemSize = 64; // globalItemSize has to be a multiple of localItemSize. 1024/64 = 16
+    size_t localItemSize = 8; // globalItemSize has to be a multiple of localItemSize. 24/8 = 3
     ret = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
 
     // Read from device back to host.
     ret = clEnqueueReadBuffer(commandQueue, cMemObj, CL_TRUE, 0, SIZE * sizeof(float), C, 0, NULL, NULL);
 
     // Write result
-    /*
+    int i;
 	for (i=0; i<SIZE; ++i) {
 
-		printf("%f + %f = %f\n", A[i], B[i], C[i]);
+		printf("%d + %d = %d\n", A[i], B[i], C[i]);
 
 	}
-	*/
+	
 
     // Test if correct answer
     for (i = 0; i < SIZE; ++i)
