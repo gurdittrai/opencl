@@ -38,18 +38,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
         count += a[i];
     }
 
-    
-    int x = (int)gid % row_size;
     int bours = 0;
-    // if (gid - 1 >= 0)
-    // {
-    //     bours += a[gid-1];
-    // }
-
-    // if (gid + 1 < row_size)
-    // {
-    //     bours += a[gid+1];
-    // }
 
     // check row
     for (i = (gid - 1); i < (gid + 2); i += 1)
@@ -72,11 +61,11 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
         for (j = (i - 1); j < (i + 2); j += 1)
         {
             // border
-            int y = (int) i / row_size;
-            int lwr_lim = j < ((y) * row_size);
-            int upp_lim = j > (((y+1) * row_size) - 1);
-            if (lwr_lim || upp_lim)
-                continue;
+            // int y = (int) i / row_size;
+            // int lwr_lim = j < ((y) * row_size);
+            // int upp_lim = j > (((y+1) * row_size) - 1);
+            // if (lwr_lim || upp_lim)
+            //     continue;
             
             bours += 1;
         }
