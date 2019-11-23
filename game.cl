@@ -52,13 +52,13 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     // }
 
     // change row 
-    for (i = (gid - row_size); i <= (gid + row_size); i += row_size)
-    {
-        // border
-        int lwr_lim = i < 0;
-        int upp_lim = i > arr_size - 1;
-        if (lwr_lim || upp_lim)
-            continue;
+    // for (i = (gid - row_size); i <= (gid + row_size); i += row_size)
+    // {
+    //     // border
+    //     int lwr_lim = i < 0;
+    //     int upp_lim = i > arr_size - 1;
+    //     if (lwr_lim || upp_lim)
+    //         continue;
         
         // check columns beside it
         for (j = (i - 1); j <= (i + 1); j += 1)
@@ -71,7 +71,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
             
             bours += a[j];
         }
-    }
+    // }
 
     c[gid] = (bours * 100) + (count * 10) + a[gid];
 }
