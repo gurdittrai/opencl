@@ -1,5 +1,6 @@
 int count_neightbours(int *board, int gid, int row_size, int arr_size)
 {
+    int i, j;
     int count = 0;
     // check rows
     for (i = gid - row_size; i < gid + (2*row_size) ; i += row_size)
@@ -20,7 +21,7 @@ int count_neightbours(int *board, int gid, int row_size, int arr_size)
             if (lwr_lim || upp_lim)
                 continue;
             
-            count += a[j];
+            count += board[j];
         }
     }
     return count;
