@@ -1,8 +1,8 @@
 #define PROGRAM_FILE "game.cl"
 #define KERNEL_FUNC "game"
-// 24x24 board
-#define ROW_SIZE 4
-#define ARRAY_SIZE 16
+// 24x24 board (576 elements)
+#define ROW_SIZE 24
+#define ARRAY_SIZE 576
 
 #define RAND 0
 
@@ -62,7 +62,10 @@ void printBoard(int *board)
 
 int main(int argc, char **argv)
 {
+    // initiaze variables
     int bytes = ARRAY_SIZE * sizeof(int);
+    int kernel_cnt = 2;
+    int output = 1;
 
     // Allocate memories for input arrays and output array.
     int *A = initBoard(1);
