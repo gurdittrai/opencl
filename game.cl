@@ -33,10 +33,10 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     int row_size = (int) get_local_size(0);
 
     int count = 0;
-    if (a[gid - 1] == 1)
-        count += 1;
-    if (a[gid + 1] == 1)
-        count += 1;
+    // if (a[gid - 1] == 1)
+    //     count += 1;
+    // if (a[gid + 1] == 1)
+    //     count += 1;
 
     c[gid] = (count*100) + (row_size*10) + a[gid] + b[gid];
 }
