@@ -74,7 +74,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
 
     for (i = gid - row_size; i < gid + (2*row_size) ; i += row_size)
     {
-        if ((i - row_size) < 0)
+        if (i < 0)
         {
             continue;
         }
