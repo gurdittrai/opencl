@@ -69,7 +69,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
             if (lwr_lim || upp_lim)
                 continue;
             
-            bours += a[j];
+            bours += 1;
         }
     // }
 
