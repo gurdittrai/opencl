@@ -63,6 +63,7 @@ int main(int argc, char **argv)
 {
 
     int SIZE = ARRAY_SIZE;
+    int bytes = SIZE * sizeof(int);
 
     // Allocate memories for input arrays and output array.
     int *A = initBoard(1);
@@ -86,13 +87,13 @@ int main(int argc, char **argv)
     cl_command_queue commandQueue = clCreateCommandQueueWithProperties(context, deviceID, 0, &ret);
 
     // Memory buffers for each array
-    cl_mem aMemObj = clCreateBuffer(context, CL_MEM_READ_ONLY, SIZE * sizeof(float), NULL, &ret);
-    cl_mem bMemObj = clCreateBuffer(context, CL_MEM_READ_ONLY, SIZE * sizeof(float), NULL, &ret);
-    cl_mem cMemObj = clCreateBuffer(context, CL_MEM_WRITE_ONLY, SIZE * sizeof(float), NULL, &ret);
+    cl_mem aMemObj = clCreateBuffer(context, CL_MEM_READ_ONLY, bytes, NULL, &ret);
+    cl_mem bMemObj = clCreateBuffer(context, CL_MEM_READ_ONLY, bytes, NULL, &ret);
+    cl_mem cMemObj = clCreateBuffer(context, CL_MEM_WRITE_ONLY, bytes, NULL, &ret);
 
     // Copy lists to memory buffers
-    ret = clEnqueueWriteBuffer(commandQueue, aMemObj, CL_TRUE, 0, SIZE * sizeof(float), A, 0, NULL, NULL);
-    ret = clEnqueueWriteBuffer(commandQueue, bMemObj, CL_TRUE, 0, SIZE * sizeof(float), B, 0, NULL, NULL);
+    ret = clEnqueueWriteBuffer(commandQueue, aMemObj, CL_TRUE, 0, bytes, A, 0, NULL, NULL);
+    ret = clEnqueueWriteBuffer(commandQueue, bMemObj, CL_TRUE, 0, bytes, B, 0, NULL, NULL);
 
     // create program
     cl_program program = build_program(context, deviceID, PROGRAM_FILE);
@@ -117,7 +118,7 @@ int main(int argc, char **argv)
     ret = clEnqueueNDRangeKernel(commandQueue, kernel, 1, NULL, &globalItemSize, &localItemSize, 0, NULL, NULL);
 
     // Read from device back to host.
-    ret = clEnqueueReadBuffer(commandQueue, cMemObj, CL_TRUE, 0, SIZE * sizeof(float), C, 0, NULL, NULL);
+    ret = clEnqueueReadBuffer(commandQueue, cMemObj, CL_TRUE, 0, bytes, C, 0, NULL, NULL);
 
     // Write result
     int i;
