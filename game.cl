@@ -15,7 +15,7 @@ int count_neightbours(int *board, int y, int x)
             if ((j < 0) || (j > 23))
                 continue;
 
-            if (board[(i*24)+j] == 1)
+            if (board[(i*4)+j] == 1)
                 count += 1;
         }
     }
@@ -24,8 +24,11 @@ int count_neightbours(int *board, int y, int x)
     return count - board[(y*24)+x];
 }
 
-__kernel void game(__global const int *a, __global const int *b, __global int *c)
+__kernel void game(__global const int *board_curr, __global const int *b, __global int *board_next)
 {
     int gid = get_global_id(0);
-    c[gid] = get_global_id(0);
+
+    int y = (int) gid / 4;
+    int x = (int) gid % 4;
+    board_next[gid] = count_neightbours(a, y, x);
 }
