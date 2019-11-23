@@ -30,6 +30,7 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
 
     int y = (int) gid / 4;
     int x = (int) gid % 4;
+    int row_size = get_local_size(0);
 
-    c[gid] = (get_global_size(0)*100) + (get_local_size(0)*10) + a[gid] + b[gid];
+    c[gid] = (get_global_size(0)*100) + (row_size*10) + a[gid] + b[gid];
 }
