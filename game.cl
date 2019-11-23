@@ -44,5 +44,5 @@ __kernel void game(__global const int *a, __global const int *b, __global int *c
     if (agid < 0)
         agid = 1;
 
-    c[gid] = a[gid] + a[agid];
+    c[gid] = (count * 10) + a[gid] + a[agid];
 }
