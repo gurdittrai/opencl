@@ -111,7 +111,7 @@ int main(int argc, char **argv)
         turnB = temp;
     }
 
-    int k_iter;
+    int k_iter, k_incr = 1;
     turnA = 0;
     turnB = 1;
 
@@ -125,12 +125,13 @@ int main(int argc, char **argv)
         curs_set(FALSE);
     }
 
-    for (i = 0, k_iter = 0; getch() != 'q' && i < 100; i += 1, k_iter += 1)
+    for (i = 0, k_iter = 0; getch() != 'q' && i < 100; i += 1, k_iter += k_incr)
     {
         // reset iter
-        if (k_iter >= k_cnt)
+        if ((k_iter < 0) || (k_iter > k_cnt))
         {
-            k_iter = 0;
+            k_incr *= -1;
+            continue;
         }
 
         // run kernel
