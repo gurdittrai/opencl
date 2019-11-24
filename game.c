@@ -70,40 +70,36 @@ int main(int argc, char **argv)
     // get args
     get_args(argc, argv, &output, &k_cnt);
 
-    // Getting platform and device information
+    // getting platform and device information
     cl_platform_id platformId = NULL;
     cl_device_id deviceID = NULL;
-    cl_uint retNumDevices;
-    cl_uint retNumPlatforms;
-    cl_int ret = clGetPlatformIDs(1, &platformId, &retNumPlatforms);
-    ret = clGetDeviceIDs(platformId, CL_DEVICE_TYPE_DEFAULT, 1, &deviceID, &retNumDevices);
+    cl_int ret;
+    ret = clGetPlatformIDs(1, &platformId, NULL);
+    ret = clGetDeviceIDs(platformId, CL_DEVICE_TYPE_DEFAULT, 1, &deviceID, NULL);
 
-    // Creating context.
+    // creating context
     cl_context context = clCreateContext(NULL, 1, &deviceID, NULL, NULL, &ret);
 
-    // Creating command queue
-    cl_command_queue commandQueue = clCreateCommandQueueWithProperties(context, deviceID, 0, &ret);
+    // creating command queue
+    cl_command_queue command_queue = clCreateCommandQueueWithProperties(context, deviceID, 0, &ret);
 
-    // Memory buffers for each array
+    // buffers for each array
     cl_mem buffer[2];
     buffer[0] = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
     buffer[1] = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
 
-    // Copy lists to memory buffers
-    ret = clEnqueueWriteBuffer(commandQueue, buffer[0], CL_TRUE, 0, bytes, board[0], 0, NULL, NULL);
+    // initialize buffer
+    ret = clEnqueueWriteBuffer(command_queue, buffer[0], CL_TRUE, 0, bytes, board[0], 0, NULL, NULL);
 
     // create program
     cl_program program = build_program(context, deviceID, PROGRAM_FILE);
 
-    // Build program
-    ret = clBuildProgram(program, 1, &deviceID, NULL, NULL, NULL);
-
-    // Create kernel
+    // create kernel array
     cl_kernel kernel[k_cnt];
     for (i = 0; i < k_cnt; i += 1)
         kernel[i] = clCreateKernel(program, KERNEL_FUNC, &ret);
 
-    // Set arguments for kernel
+    // arguments for kernel
     for (i = 0; i < k_cnt; i += 1)
     {
         ret = clSetKernelArg(kernel[i], 0, sizeof(cl_mem), (void *)&buffer[turnA]);
@@ -137,19 +133,22 @@ int main(int argc, char **argv)
             k_iter = 0;
         }
 
-        // Execute the kernel
-        ret = clEnqueueNDRangeKernel(commandQueue, kernel[k_iter], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
+        // run kernel
+        ret = clEnqueueNDRangeKernel(command_queue, kernel[k_iter], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
 
-        // Read from device back to host.
-        ret = clEnqueueReadBuffer(commandQueue, buffer[turnB], CL_TRUE, 0, bytes, board[turnB], 0, NULL, NULL);
+        // get output
+        ret = clEnqueueReadBuffer(command_queue, buffer[turnB], CL_TRUE, 0, bytes, board[turnB], 0, NULL, NULL);
+
+        // ** uncomment to check output without ncurses **
+        // printBoard(board[turnB], ARRAY_SIZE, ROW_SIZE);
+
+        if (output == 1)
+            drawBalls(board[turnB], ROW_SIZE, k_iter, turnB);
 
         // swap buffers
         int temp = turnA;
         turnA = turnB;
         turnB = temp;
-
-        if (output == 1)
-            drawBalls(board[turnB], ROW_SIZE, k_iter, turnB);
     }
 
     // Write result
@@ -164,16 +163,18 @@ int main(int argc, char **argv)
 
     printf("successful exit after %d iterations\n", i);
 
-    // Clean up, release memory.
-    ret = clFlush(commandQueue);
-    ret = clFinish(commandQueue);
-    ret = clReleaseCommandQueue(commandQueue);
+    // free memory
+    clFlush(command_queue);
+    clFinish(command_queue);
+    clReleaseCommandQueue(command_queue);
+
     for (i = 0; i < k_cnt; i += 1)
-        ret = clReleaseKernel(kernel[i]);
-    ret = clReleaseProgram(program);
-    ret = clReleaseMemObject(buffer[0]);
-    ret = clReleaseMemObject(buffer[1]);
-    ret = clReleaseContext(context);
+        clReleaseKernel(kernel[i]);
+    
+    clReleaseMemObject(buffer[0]);
+    clReleaseMemObject(buffer[1]);
+    clReleaseProgram(program);
+    clReleaseContext(context);
     free(board[0]);
     free(board[1]);
     free(board);
