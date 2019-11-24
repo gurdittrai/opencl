@@ -115,7 +115,6 @@ int main(int argc, char **argv)
         turnB = temp;
     }
 
-    char ch = '0';
     int k_iter;
     turnA = 0;
     turnB = 1;
@@ -130,7 +129,7 @@ int main(int argc, char **argv)
         curs_set(FALSE);
     }
 
-    for (k_iter = 0; ch != 'q'; k_iter += 1)
+    for (k_iter = 0; getch() != 'q'; k_iter += 1)
     {
         // reset iter
         if (k_iter >= k_cnt)
@@ -154,8 +153,6 @@ int main(int argc, char **argv)
 
         if (output)
             drawBalls(board[turnB], ROW_SIZE, k_iter, turnB, output);
-
-        ch = getch();
     }
 
     // Write result
