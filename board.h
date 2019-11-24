@@ -125,7 +125,7 @@ int drawBalls(int *board, int row_size, int k_iter, int turn, int output)
     char ch = getch();
 
     // wait
-    sleep(DELAY);
+    sleep(1);
 
     // check
     if (ch == 'q')
