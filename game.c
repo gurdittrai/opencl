@@ -5,7 +5,7 @@
 #define ROW_SIZE 24
 #define ARRAY_SIZE 576
 
-#define RAND 0
+#define RAND 1
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,8 +14,6 @@
 #include <ncurses.h>
 #include <unistd.h>
 
-// can request deprecated version of OpenCL API using:
-//   #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #define CL_TARGET_OPENCL_VERSION 220
 
 #ifdef __APPLE__

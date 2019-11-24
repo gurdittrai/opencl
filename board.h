@@ -1,8 +1,6 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#define DELAY 1000000
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
