@@ -131,6 +131,7 @@ int main(int argc, char **argv)
         if ((k_iter < 0) || (k_iter >= k_cnt))
         {
             k_incr *= -1;
+            k_iter += k_incr;
             continue;
         }
 
