@@ -5,7 +5,7 @@
 #define ROW_SIZE 24
 #define ARRAY_SIZE 576
 
-#define RAND 0
+#define RAND 1
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,7 +41,7 @@ void get_args(int argc, char *argv[], int *output, int *k_cnt)
 
             // get arg (1-6)
             *k_cnt = argv[i + 1][0] - '0';
-            if ((*k_cnt < 0) || (*k_cnt > 6))
+            if ((*k_cnt < 1) || (*k_cnt > 6))
             {
                 printf("invalid kernel count (default 2 used)\n");
                 *k_cnt = 2;
