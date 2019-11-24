@@ -128,7 +128,7 @@ int main(int argc, char **argv)
     for (i = 0, k_iter = 0; getch() != 'q' && i < 100; i += 1, k_iter += k_incr)
     {
         // reset iter
-        if ((k_iter < 0) || (k_iter > k_cnt))
+        if ((k_iter < 0) || (k_iter >= k_cnt))
         {
             k_incr *= -1;
             continue;
