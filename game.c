@@ -119,7 +119,18 @@ int main(int argc, char **argv)
     int k_iter = 0;
     turnA = 0;
     turnB = 1;
-    for (i = 0; i < 10; i += 1, k_iter += 1)
+
+    // initialize curses
+    if (output == 1)
+    {
+        initscr();
+        noecho();
+        cbreak();
+        timeout(0);
+        curs_set(FALSE);
+    }
+
+    for (i = 0; i < 25; i += 1, k_iter += 1)
     {
         // reset iter
         if (k_iter >= k_cnt)
@@ -133,18 +144,24 @@ int main(int argc, char **argv)
         // Read from device back to host.
         ret = clEnqueueReadBuffer(commandQueue, buffer[turnB], CL_TRUE, 0, bytes, board[turnB], 0, NULL, NULL);
 
-        printf("-- Kernal %d --\n", k_iter + 1);
-        printBoard(board[turnB], ARRAY_SIZE, ROW_SIZE);
+        // printf("-- Kernal %d --\n", k_iter + 1);
+        // printBoard(board[turnB], ARRAY_SIZE, ROW_SIZE);
 
         // swap buffers
         int temp = turnA;
         turnA = turnB;
         turnB = temp;
+
+        if (output == 1)
+            drawBalls(board[turnB], ROW_SIZE, k_iter, turnB);
     }
 
     // Write result
     if (output == 1)
+    {
+        endwin();
         printf("Finished\n");
+    }
 
     // Clean up, release memory.
     ret = clFlush(commandQueue);
