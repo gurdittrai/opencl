@@ -5,7 +5,7 @@
 #define ROW_SIZE 24
 #define ARRAY_SIZE 576
 
-#define RAND 1
+#define RAND 0
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -109,7 +109,8 @@ int main(int argc, char **argv)
         turnB = temp;
     }
 
-    int k_iter, k_incr = 1;
+    int k_iter;
+    int k_incr = (k_cnt == 1) ? 0 : 1;
     turnA = 0;
     turnB = 1;
 
