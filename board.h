@@ -89,51 +89,39 @@ void printBoard(int *board, int arr_size, int row_size)
     {
         for (j = 0; j < row_size; j += 1)
         {
-            printf("%3d ", board[i + j]);
+            printf("%3c", (board[i + j] ? 'o' : ' '));
         }
         printf("\n");
     }
     printf("\n");
 }
 
-int drawBalls(int *board, int row_size, int k_iter, int turn, int output)
+void drawBalls(int *board, int row_size, int k_iter, int turn)
 {
     int i, j;
 
-    if (output)
+    // clear old screen
+    clear();
+
+    // draw header
+    mvprintw(0, 0, "-- kernal %d ", k_iter);
+    mvprintw(0, 13, " board %c --", (turn ? 'B' : 'A'));
+    mvprintw(26, 0, "-- press q to quit --");
+
+    // display balls
+    for (i = 0; i < row_size; i += 1)
     {
-        // clear old screen
-        clear();
-
-        // draw header
-        mvprintw(0, 0, "-- kernal %d ", k_iter);
-        mvprintw(0, 13, " board %c --", (turn ? 'B' : 'A'));
-
-        // display balls
-        for (i = 0; i < row_size; i += 1)
+        for (j = 0; j < row_size; j += 1)
         {
-            for (j = 0; j < row_size; j += 1)
-            {
-                if (board[(i * row_size) + j])
-                    mvprintw(i + 1, j + 1, "o");
-            }
+            if (board[(i * row_size) + j])
+                mvprintw(i + 1, j + 1, "o");
         }
-
-        refresh();
     }
-    // get key
-    char ch = getch();
+
+    refresh();
 
     // wait
     sleep(1);
-
-    // check
-    if (ch == 'q')
-    {
-        return 0;
-    }
-
-    return 1;
 }
 
 #endif

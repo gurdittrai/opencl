@@ -129,7 +129,7 @@ int main(int argc, char **argv)
         curs_set(FALSE);
     }
 
-    for (k_iter = 0; getch() != 'q'; k_iter += 1)
+    for (i = 0, k_iter = 0; getch() != 'q' || i < 100; i += 1, k_iter += 1)
     {
         // reset iter
         if (k_iter >= k_cnt)
@@ -143,24 +143,26 @@ int main(int argc, char **argv)
         // Read from device back to host.
         ret = clEnqueueReadBuffer(commandQueue, buffer[turnB], CL_TRUE, 0, bytes, board[turnB], 0, NULL, NULL);
 
-        // printf("-- Kernal %d --\n", k_iter + 1);
-        // printBoard(board[turnB], ARRAY_SIZE, ROW_SIZE);
-
         // swap buffers
         int temp = turnA;
         turnA = turnB;
         turnB = temp;
 
         if (output)
-            drawBalls(board[turnB], ROW_SIZE, k_iter, turnB, output);
+            drawBalls(board[turnB], ROW_SIZE, k_iter, turnB);
     }
 
     // Write result
     if (output == 1)
     {
         endwin();
-        printf("Finished\n");
     }
+    else
+    {
+        printBoard(board[turnB], ARRAY_SIZE, ROW_SIZE);
+    }
+
+    printf("successful exit\n");
 
     // Clean up, release memory.
     ret = clFlush(commandQueue);
