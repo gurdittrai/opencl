@@ -72,8 +72,8 @@ int main(int argc, char **argv)
     cl_platform_id platformId = NULL;
     cl_device_id deviceID = NULL;
     cl_int ret;
-    ret = clGetPlatformIDs(1, &platformId, NULL);
-    ret = clGetDeviceIDs(platformId, CL_DEVICE_TYPE_DEFAULT, 1, &deviceID, NULL);
+    clGetPlatformIDs(1, &platformId, NULL);
+    clGetDeviceIDs(platformId, CL_DEVICE_TYPE_DEFAULT, 1, &deviceID, NULL);
 
     // creating context
     cl_context context = clCreateContext(NULL, 1, &deviceID, NULL, NULL, &ret);
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
     buffer[1] = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, &ret);
 
     // initialize buffer
-    ret = clEnqueueWriteBuffer(command_queue, buffer[0], CL_TRUE, 0, bytes, board[0], 0, NULL, NULL);
+    clEnqueueWriteBuffer(command_queue, buffer[0], CL_TRUE, 0, bytes, board[0], 0, NULL, NULL);
 
     // create program
     cl_program program = build_program(context, deviceID, PROGRAM_FILE);
@@ -100,8 +100,8 @@ int main(int argc, char **argv)
     // arguments for kernel
     for (i = 0; i < k_cnt; i += 1)
     {
-        ret = clSetKernelArg(kernel[i], 0, sizeof(cl_mem), (void *)&buffer[turnA]);
-        ret = clSetKernelArg(kernel[i], 1, sizeof(cl_mem), (void *)&buffer[turnB]);
+        clSetKernelArg(kernel[i], 0, sizeof(cl_mem), (void *)&buffer[turnA]);
+        clSetKernelArg(kernel[i], 1, sizeof(cl_mem), (void *)&buffer[turnB]);
 
         // swap buffers
         int temp = turnA;
@@ -135,10 +135,10 @@ int main(int argc, char **argv)
         }
 
         // run kernel
-        ret = clEnqueueNDRangeKernel(command_queue, kernel[k_iter], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
+        clEnqueueNDRangeKernel(command_queue, kernel[k_iter], 1, NULL, &global_size, &local_size, 0, NULL, NULL);
 
         // get output
-        ret = clEnqueueReadBuffer(command_queue, buffer[turnB], CL_TRUE, 0, bytes, board[turnB], 0, NULL, NULL);
+        clEnqueueReadBuffer(command_queue, buffer[turnB], CL_TRUE, 0, bytes, board[turnB], 0, NULL, NULL);
 
         // ** uncomment to check output without ncurses **
         // printBoard(board[turnB], ARRAY_SIZE, ROW_SIZE);
@@ -150,6 +150,12 @@ int main(int argc, char **argv)
         int temp = turnA;
         turnA = turnB;
         turnB = temp;
+
+        // set kernal arguments for single kernal exe
+        if (k_cnt == 1) {
+            clSetKernelArg(kernel[0], 0, sizeof(cl_mem), (void *)&buffer[turnA]);
+            clSetKernelArg(kernel[0], 1, sizeof(cl_mem), (void *)&buffer[turnB]);
+        }
     }
 
     // Write result
