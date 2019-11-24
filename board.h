@@ -9,25 +9,7 @@
 #include <math.h>
 
 #include <ncurses.h>
-#include <time.h>
-
-// void insert_shapes(int *board)
-// {
-//     int ofs = ROW_SIZE;
-//     // check
-//     board[(0 * ofs) + 0] = 1;
-//     board[(0 * ofs) + 5] = 0;
-//     board[(5 * ofs) + 0] = 0;
-//     board[(5 * ofs) + 5] = 1;
-
-//     // toad
-//     board[(2 * ofs) + 2] = 1;
-//     board[(2 * ofs) + 3] = 1;
-//     board[(2 * ofs) + 4] = 1;
-//     board[(3 * ofs) + 1] = 1;
-//     board[(3 * ofs) + 2] = 1;
-//     board[(3 * ofs) + 3] = 1;
-// }
+#include <unistd.h>
 
 void insert_shapes(int *board)
 {
@@ -124,8 +106,8 @@ int drawBalls(int *board, int row_size, int k_iter, int turn, int output)
         clear();
 
         // draw header
-        mvprintw(1, 1, "-- kernal %2d --", k_iter);
-        mvprintw(1, 12, "-- board %c --", (turn ? 'B' : 'A'));
+        mvprintw(0, 0, "-- kernal %d ", k_iter);
+        mvprintw(0, 13, " board %c --", (turn ? 'B' : 'A'));
 
         // display balls
         for (i = 0; i < row_size; i += 1)
@@ -139,8 +121,13 @@ int drawBalls(int *board, int row_size, int k_iter, int turn, int output)
 
         refresh();
     }
-
+    // get key
     char ch = getch();
+
+    // wait
+    sleep(DELAY);
+
+    // check
     if (ch == 'q')
     {
         return 0;
