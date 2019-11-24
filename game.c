@@ -1,5 +1,6 @@
 #define PROGRAM_FILE "game.cl"
 #define KERNEL_FUNC "game"
+
 // 24x24 board (576 elements)
 #define ROW_SIZE 6
 #define ARRAY_SIZE 36
@@ -23,7 +24,8 @@
 #include <CL/cl.h>
 #endif
 
-#include "opencl_struct.h"
+#include "board.h"
+#include "ocl_structures.h"
 
 void get_args(int argc, char *argv[], int *output, int *k_cnt)
 {
@@ -33,7 +35,7 @@ void get_args(int argc, char *argv[], int *output, int *k_cnt)
         {
             *output = 1;
         }
-        else if (strcmp(argv[i], "-k") == 0)
+        else if (strcmp(argv[i], "-n") == 0)
         {
             // check count arg exists
             if (i + 1 > argc)
@@ -48,65 +50,6 @@ void get_args(int argc, char *argv[], int *output, int *k_cnt)
             }
         }
     }
-}
-
-void insert_shapes(int *board)
-{
-    int ofs = ROW_SIZE;
-    // check
-    board[(0 * ofs) + 0] = 1;
-    board[(0 * ofs) + 5] = 0;
-    board[(5 * ofs) + 0] = 0;
-    board[(5 * ofs) + 5] = 1;
-
-    // toad
-    board[(2 * ofs) + 2] = 1;
-    board[(2 * ofs) + 3] = 1;
-    board[(2 * ofs) + 4] = 1;
-    board[(3 * ofs) + 1] = 1;
-    board[(3 * ofs) + 2] = 1;
-    board[(3 * ofs) + 3] = 1;
-}
-
-int *initBoard(int test)
-{
-    int i, j;
-
-    int *board = malloc(sizeof(int) * ARRAY_SIZE);
-
-    for (i = 0; i < ARRAY_SIZE; i += ROW_SIZE)
-    {
-        // assign values
-        for (j = 0; j < ROW_SIZE; j += 1)
-        {
-            //random
-            // int r = ((random() % 100) > 45) ? 0 : 1;
-            // board[i + j] = r * RAND;
-            // board[i + j] = test * (i + j);
-            board[i + j] = ((i + j + test) % 2) * RAND;
-        }
-    }
-
-    if (ARRAY_SIZE == 36)
-    {
-        insert_shapes(board);
-    }
-
-    return board;
-}
-
-void printBoard(int *board)
-{
-    int i, j;
-    for (i = 0; i < ARRAY_SIZE; i += ROW_SIZE)
-    {
-        for (j = 0; j < ROW_SIZE; j += 1)
-        {
-            printf("%3d ", board[i + j]);
-        }
-        printf("\n");
-    }
-    printf("\n");
 }
 
 int main(int argc, char **argv)
@@ -213,9 +156,7 @@ int main(int argc, char **argv)
     ret = clReleaseMemObject(buffer[0]);
     ret = clReleaseMemObject(buffer[1]);
     ret = clReleaseContext(context);
-    free(board[0]);
-    free(board[1]);
-    free(board);
+    freeBoard(board);
 
     return 0;
 }

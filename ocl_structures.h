@@ -1,3 +1,6 @@
+#ifndef OCL_STRUCTURES_H
+#define OCL_STRUCTURES_H
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -77,4 +80,4 @@ cl_program build_program(cl_context ctx, cl_device_id device, const char *filena
     return program;
 }
 
-
+#endif

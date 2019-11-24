@@ -56,4 +56,4 @@ $(PROJ): $(PROJ).c
 .PHONY: clean
 
 clean:
-	rm $(PROJ)
+	rm a4
