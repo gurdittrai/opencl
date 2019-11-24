@@ -65,11 +65,10 @@ int main(int argc, char **argv)
     // boards A and B
     int **board = malloc(sizeof(int *) * 2);
     board[0] = initBoard(ARRAY_SIZE, ROW_SIZE);
-    board[1] = malloc(sizeof(int) * ARRAY_SIZE);
+    board[1] = initBoard(ARRAY_SIZE, ROW_SIZE);
 
     // get args
     get_args(argc, argv, &output, &k_cnt);
-    printf("kernal count %d\n output %d\n", k_cnt, output);
 
     // Getting platform and device information
     cl_platform_id platformId = NULL;
@@ -116,6 +115,7 @@ int main(int argc, char **argv)
         turnB = temp;
     }
 
+    char ch = '0';
     int k_iter;
     turnA = 0;
     turnB = 1;
@@ -130,7 +130,7 @@ int main(int argc, char **argv)
         curs_set(FALSE);
     }
 
-    for (k_iter = 0; drawBalls(board[turnB], ROW_SIZE, k_iter, turnB, output); k_iter += 1)
+    for (k_iter = 0; ch != 'q'; k_iter += 1)
     {
         // reset iter
         if (k_iter >= k_cnt)
@@ -151,6 +151,11 @@ int main(int argc, char **argv)
         int temp = turnA;
         turnA = turnB;
         turnB = temp;
+
+        if (output)
+            drawBalls(board[turnB], ROW_SIZE, k_iter, turnB, output);
+
+        ch = getch();
     }
 
     // Write result
