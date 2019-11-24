@@ -33,7 +33,7 @@ void get_args(int argc, char *argv[], int *output, int *k_cnt)
     {
         if (strcmp(argv[i], "-o") == 0)
         {
-            *output = 1;
+            *output = 0;
         }
         else if (strcmp(argv[i], "-n") == 0)
         {
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
         turnB = temp;
     }
 
-    int k_iter = 0;
+    int k_iter;
     turnA = 0;
     turnB = 1;
 
@@ -130,7 +130,7 @@ int main(int argc, char **argv)
         curs_set(FALSE);
     }
 
-    for (i = 0; i < 25; i += 1, k_iter += 1)
+    for (k_iter = 0; drawBalls(board[turnB], ROW_SIZE, k_iter, turnB, output); k_iter += 1)
     {
         // reset iter
         if (k_iter >= k_cnt)
@@ -151,9 +151,6 @@ int main(int argc, char **argv)
         int temp = turnA;
         turnA = turnB;
         turnB = temp;
-
-        if (output == 1)
-            drawBalls(board[turnB], ROW_SIZE, k_iter, turnB);
     }
 
     // Write result

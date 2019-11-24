@@ -114,28 +114,31 @@ void printBoard(int *board, int arr_size, int row_size)
     printf("\n");
 }
 
-int drawBalls(int *board, int row_size, int k_iter, int turn)
+int drawBalls(int *board, int row_size, int k_iter, int turn, int output)
 {
     int i, j;
 
-    // clear old screen
-    clear();
-
-    // draw header
-    mvprintw(1, 1, "-- kernal %2d --", k_iter);
-    mvprintw(1, 12, "-- board %c --", (turn ? 'B' : 'A'));
-
-    // display balls
-    for (i = 0; i < row_size; i += 1)
+    if (output)
     {
-        for (j = 0; j < row_size; j += 1)
-        {
-            if (board[(i * row_size) + j])
-                mvprintw(i + 1, j + 1, "o");
-        }
-    }
+        // clear old screen
+        clear();
 
-    refresh();
+        // draw header
+        mvprintw(1, 1, "-- kernal %2d --", k_iter);
+        mvprintw(1, 12, "-- board %c --", (turn ? 'B' : 'A'));
+
+        // display balls
+        for (i = 0; i < row_size; i += 1)
+        {
+            for (j = 0; j < row_size; j += 1)
+            {
+                if (board[(i * row_size) + j])
+                    mvprintw(i + 1, j + 1, "o");
+            }
+        }
+
+        refresh();
+    }
 
     char ch = getch();
     if (ch == 'q')
