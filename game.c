@@ -129,7 +129,7 @@ int main(int argc, char **argv)
         curs_set(FALSE);
     }
 
-    for (i = 0, k_iter = 0; getch() != 'q' || i < 100; i += 1, k_iter += 1)
+    for (i = 0, k_iter = 0; getch() != 'q' && i < 100; i += 1, k_iter += 1)
     {
         // reset iter
         if (k_iter >= k_cnt)
@@ -148,7 +148,7 @@ int main(int argc, char **argv)
         turnA = turnB;
         turnB = temp;
 
-        if (output)
+        if (output == 1)
             drawBalls(board[turnB], ROW_SIZE, k_iter, turnB);
     }
 
@@ -162,7 +162,7 @@ int main(int argc, char **argv)
         printBoard(board[turnB], ARRAY_SIZE, ROW_SIZE);
     }
 
-    printf("successful exit\n");
+    printf("successful exit after %d iterations\n", i);
 
     // Clean up, release memory.
     ret = clFlush(commandQueue);
