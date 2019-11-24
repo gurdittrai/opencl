@@ -1,9 +1,9 @@
 #define PROGRAM_FILE "game.cl"
 #define KERNEL_FUNC "game"
 
-// 24x24 board (576 elements)
-#define ROW_SIZE 6
-#define ARRAY_SIZE 36
+// 24 x 24 board (576 elements)
+#define ROW_SIZE 24
+#define ARRAY_SIZE 576
 
 #define RAND 0
 
@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 
     // boards A and B
     int **board = malloc(sizeof(int *) * 2);
-    board[0] = initBoard(1);
+    board[0] = initBoard(ARRAY_SIZE, ROW_SIZE);
     board[1] = malloc(sizeof(int) * ARRAY_SIZE);
 
     // get args
@@ -134,7 +134,7 @@ int main(int argc, char **argv)
         ret = clEnqueueReadBuffer(commandQueue, buffer[turnB], CL_TRUE, 0, bytes, board[turnB], 0, NULL, NULL);
 
         printf("-- Kernal %d --\n", k_iter + 1);
-        printBoard(board[turnB]);
+        printBoard(board[turnB], ARRAY_SIZE, ROW_SIZE);
 
         // swap buffers
         int temp = turnA;
@@ -156,7 +156,9 @@ int main(int argc, char **argv)
     ret = clReleaseMemObject(buffer[0]);
     ret = clReleaseMemObject(buffer[1]);
     ret = clReleaseContext(context);
-    freeBoard(board);
+    free(board[0]);
+    free(board[1]);
+    free(board);
 
     return 0;
 }

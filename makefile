@@ -25,7 +25,7 @@ ifneq ($(DARWIN),)
 else
 
 # Linux OS
-LIBS=-lOpenCL
+LIBS=-lOpenCL -lncurses
 ifeq ($(PROC_TYPE),)
 	CFLAGS+=-m32
 else

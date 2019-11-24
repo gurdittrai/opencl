@@ -1,17 +1,15 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-// 24x24 board (576 elements)
-#define ROW_SIZE 6
-#define ARRAY_SIZE 36
+#define DELAY 1000000
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <ncurses.h>
-#include <unistd.h>
 
+#include <ncurses.h>
+#include <time.h>
 
 // void insert_shapes(int *board)
 // {
@@ -34,7 +32,7 @@
 void insert_shapes(int *board)
 {
     int ofs = ROW_SIZE;
-    // still lifes 
+    // still lifes
     // block
     board[(1 * ofs) + 2] = 1;
     board[(1 * ofs) + 3] = 1;
@@ -77,16 +75,16 @@ void insert_shapes(int *board)
     board[(7 * ofs) + 11] = 1;
 }
 
-int *initBoard(int test)
+int *initBoard(int arr_size, int row_size)
 {
     int i, j;
 
-    int *board = malloc(sizeof(int) * ARRAY_SIZE);
+    int *board = malloc(sizeof(int) * arr_size);
 
-    for (i = 0; i < ARRAY_SIZE; i += ROW_SIZE)
+    for (i = 0; i < arr_size; i += row_size)
     {
         // assign values
-        for (j = 0; j < ROW_SIZE; j += 1)
+        for (j = 0; j < row_size; j += 1)
         {
             //random
             int r = ((rand() % 100) > 45) ? 0 : 1;
@@ -94,7 +92,7 @@ int *initBoard(int test)
         }
     }
 
-    if (ARRAY_SIZE == 576)
+    if (arr_size == 576)
     {
         insert_shapes(board);
     }
@@ -102,12 +100,12 @@ int *initBoard(int test)
     return board;
 }
 
-void printBoard(int *board)
+void printBoard(int *board, int arr_size, int row_size)
 {
     int i, j;
-    for (i = 0; i < ARRAY_SIZE; i += ROW_SIZE)
+    for (i = 0; i < arr_size; i += row_size)
     {
-        for (j = 0; j < ROW_SIZE; j += 1)
+        for (j = 0; j < row_size; j += 1)
         {
             printf("%3d ", board[i + j]);
         }
@@ -116,14 +114,36 @@ void printBoard(int *board)
     printf("\n");
 }
 
-void freeBoard(int **board)
+int drawBalls(int *board, int row_size, int k_iter, int turn)
 {
-    int i;
-    for (i = 0; i < ROW_SIZE; i += 1)
+    int i, j;
+
+    // clear old screen
+    clear();
+
+    // draw header
+    mvprintw(1, 1, "-- kernal %2d --", k_iter);
+    mvprintw(1, 12, "-- board %c --", (turn ? 'B' : 'A'));
+
+    // display balls
+    for (i = 0; i < row_size; i += 1)
     {
-        free(board[i]);
+        for (j = 0; j < row_size; j += 1)
+        {
+            if (board[(i * row_size) + j])
+                mvprintw(i + 1, j + 1, "o");
+        }
     }
-    free(board);
+
+    refresh();
+
+    char ch = getch();
+    if (ch == 'q')
+    {
+        return 0;
+    }
+
+    return 1;
 }
 
 #endif
