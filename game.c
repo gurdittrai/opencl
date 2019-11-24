@@ -156,10 +156,6 @@ int main(int argc, char **argv)
     {
         endwin();
     }
-    else
-    {
-        printBoard(board[turnB], ARRAY_SIZE, ROW_SIZE);
-    }
 
     printf("successful exit after %d iterations\n", i);
 
